@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS species (
   national_dex_id INTEGER PRIMARY KEY,
   name VARCHAR(20),
   image_url VARCHAR(100),
-  fem_image_url VARCHAR(100)
+  fem_image_url VARCHAR(100),
   type_primary_id INTEGER,
   type_secondary_id INTEGER,
   height INTEGER,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS possible_abilities (
 CREATE TABLE IF NOT EXISTS types (
   api_id INTEGER PRIMARY KEY,
   name VARCHAR(10),
-  damage_class_id INTEGER,
+  damage_class_id INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS types_double_damage_to (
