@@ -1,0 +1,35 @@
+main {
+  background-color: yellow;
+
+}
+
+h1 {
+  font-size: 3.2rem;
+  font-weight: bold;
+  text-shadow: 2px 2px white;
+
+}
+
+p {
+  font-size: 1.6rem;
+
+}
+
+div {
+  max-width: 50%;
+
+}
+
+@media screen and (min-width: 480px) and (max-width: 767px) {
+  main {
+    background-color: orange;
+
+  }
+}
+
+@media screen and (min-width: 768px) {
+  main {
+    background-color: red;
+
+  }
+}

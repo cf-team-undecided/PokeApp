@@ -23,9 +23,12 @@ app.use(express.urlencoded({ extended: true }));
 // Specify a directory for statis resources
 app.use(express.static('./public'));
 
-// Routes
 // Set the view engine for templating
 app.set('view engine', 'ejs');
+
+// Routes
+
+app.get('/', (request, response) => response.render('index'));
 
 app.get('*', (request, response) => response.status(404).send('This route does not exist'));
 
