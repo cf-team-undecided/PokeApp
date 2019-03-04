@@ -50,6 +50,12 @@ function Pokemon (pokemon, typeOne, typeTwo) {
 // Helper functions
 //********************
 
+function getPokemonData(id) {
+  let SQL = `ELEECT * FROM species WHERE nationa_dex_id=$1`;
+  let values = ([id]);
+  client.query(SQL, values);
+}
+
 function handleError(error, response) {
   response.render('pages/error', {error: error});
 }
