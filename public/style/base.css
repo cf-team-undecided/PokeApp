@@ -5,26 +5,25 @@
 }
 
 body {
-  width: 480px;
+  width: 40rem;
   margin: 0 auto;
-  background-color: yellow;
 
 }
 
 @media screen and (min-width: 480px) and (max-width: 767px) {
   body {
-    max-width: 47.9375rem;
+    width: 48rem;
     margin: 0 auto;
-    background-color: orange;
 
   }
 }
 
 @media screen and (min-width: 768px) {
   body {
-    max-width: 60rem;
+    max-width: 96rem;
     margin: 0 auto;
-    background-color: red;
-
+    background-color: white;
+    background: url(http://pokemipsum.com/img/pikachu.gif) repeat;
+  
   }
 }
