@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS  moves_learned (
 CREATE TABLE IF NOT EXISTS possible_abilities (
   species_id INTEGER,
   abilitiy_id INTEGER,
-  is-hidden BOOLEAN,
+  is_hidden BOOLEAN,
   FOREIGN KEY (species_id) REFERENCES (species.national_dex_id),
   FOREIGN KEY (abilitiy_id) REFERENCES (abilities.api_id)
 );

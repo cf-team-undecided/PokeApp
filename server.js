@@ -35,6 +35,16 @@ app.listen(PORT, () => console.log(`Listening on ${PORT}`));
 // Constructor
 //********************
 
+function Pokemon (pokemon, typeOne, typeTwo) {
+  this.id = pokemon.national_dex_id;
+  this.name = pokemon.name;
+  this.imageUrl = pokemon.image_url;
+  this.femImageUrl = pokemon.fem_image_url;
+  this.height = pokemon.height;
+  this.weight = pokemon.weight;
+  this.typeOne = typeOne;
+  this.typeTwo = typeTwo;
+}
 
 //********************
 // Helper functions
