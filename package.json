@@ -1,0 +1,27 @@
+{
+  "name": "pokeapp",
+  "version": "1.0.0",
+  "description": "Pokedex project",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cf-team-undecided/PokeApp.git"
+  },
+  "author": "Dana Voros, Andrew Roska, Peter Murphy, Alexander White",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cf-team-undecided/PokeApp/issues"
+  },
+  "homepage": "https://github.com/cf-team-undecided/PokeApp#readme",
+  "dependencies": {
+    "dotenv": "^6.2.0",
+    "ejs": "^2.6.1",
+    "express": "^4.16.4",
+    "pg": "^7.8.1",
+    "superagent": "^4.1.0"
+  }
+}
