@@ -28,7 +28,7 @@ app.set('view engine', 'ejs');
 
 // Routes
 
-app.get('/', (request, response) => response.render('index'));
+app.get('/', (request, response) => response.render('./index'));
 
 app.get('*', (request, response) => response.status(404).send('This route does not exist'));
 
