@@ -106,6 +106,8 @@ function getPokemonData(id) {
     })
 }
 
+
+
 function handleError(error, response) {
   response.render('pages/error', { error: error });
 }
@@ -114,10 +116,6 @@ function onePoke(request, response) {
   response.render('./pages/pokemon-detail');
   app.use(express.static('./public'));
 }
-<<<<<<< HEAD
-=======
-
->>>>>>> 89b99e62dc2f81358828c955e32974aa82003268
 // Initial database build, should be called iff database is 100% empty
 
 // buildTypeList();
