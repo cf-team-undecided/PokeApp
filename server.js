@@ -194,6 +194,20 @@ function getDamageModifierTo(baseType, targetType) {
     })
 }
 
+// gets target type list and puts in SQL
+function buildTargetTypes() {
+  let url = `https://pokeapi.co/api/v2/move-target/`;
+  superagent.get(url)
+    .then((results) => {
+      results.body.results.forEach((result) => {
+        let SQL = `INSERT INTO target_type(api_id, name) VALUES($1, $2);`;
+        let values = [result.url.split('/')[6], result.name];
+
+        client.query(SQL, values);
+      })
+    })
+}
+
 // takes the api_id of a type and returns the string name
 function getTypeName(typeId) {
   let types = ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'];
@@ -254,4 +268,9 @@ client.query(`SELECT * FROM types_damage_to`)
     }
   })
 
-
+client.query(`SELECT * FROM target_type`)
+  .then((result) => {
+    if(result.rows.length === 0) {
+      buildTargetTypes();
+    }
+  })
