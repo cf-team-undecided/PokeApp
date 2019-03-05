@@ -81,5 +81,5 @@ CREATE TABLE IF NOT EXISTS types_damage_from (
   FOREIGN KEY (type_damage_from) REFERENCES types(api_id)
 );
 
-
+-- Default null type, API doesn't give one, is needed for foreign key constraints
 INSERT INTO types(api_id, name) VALUES (0, 'none');
