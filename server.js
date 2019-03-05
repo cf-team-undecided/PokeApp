@@ -30,6 +30,8 @@ app.set('view engine', 'ejs');
 
 app.get('/', (request, response) => response.render('./index'));
 
+app.get('/detail', onePoke);
+
 app.get('*', (request, response) => response.status(404).send('This route does not exist'));
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
@@ -45,4 +47,9 @@ app.listen(PORT, () => console.log(`Listening on ${PORT}`));
 
 function handleError(error, response) {
   response.render('pages/error', {error: error});
+}
+
+function onePoke(request, response) {
+  response.render('./pages/pokemon-detail');
+  app.use(express.static('./public'));
 }
