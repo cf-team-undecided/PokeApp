@@ -109,14 +109,28 @@ function getPokemonData(id) {
     })
 }
 
+function changedArrayToPrepareForEJSRender (arr) {
+  return arr.map(type =>{
+    let whole = type;
+
+    // whole.type_primary_id =  getTypeName(type.type_primary_id); 
+    // console.log(whole);
+  })
+} 
+
 function showSearch(request, response) {
-  let SQL = 'SELECT * FROM species;';
+  let SQL = 'SELECT * FROM species LIMIT 10;';
   return client.query(SQL)
     .then(result => {
-      console.log('###', result);
-      response.render('./pages/search', {result: result.rows})
-    })
+      // let changedArray = changedArrayToPrepareForEJSRender(result.rows);
+      // console.log(changedArray);
+
+
+      response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
+    )
     .catch(error => handleError(error, response));
+  }) 
+}
 
 function buildTypeDamageMods(i) {
 
