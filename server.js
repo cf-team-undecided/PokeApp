@@ -101,6 +101,53 @@ function getPokemonData(id) {
     })
 }
 
+function buildTypeDamageMods() {
+  for (let i = 1; i < 19; i++) {
+    let url = `https://pokeapi.co/api/v2/type/${i}`;
+    superagent.get(url)
+      .then((result) => {
+        let damageToMods = new Array(18).fill(1);
+        let damageFromMods = new Array(18).fill(1);
+
+        result.body.damage_relations.double_damage_from.forEach(type =>{
+          damageFromMods[parseInt(type.url.split('/')[6])-1] = 2;
+        });
+
+        result.body.damage_relations.double_damage_to.forEach(type =>{
+          damageToMods[parseInt(type.url.split('/')[6])-1] = 2;
+        });
+
+        result.body.damage_relations.half_damage_from.forEach(type =>{
+          damageFromMods[parseInt(type.url.split('/')[6])-1] = .5;
+        });
+
+        result.body.damage_relations.half_damage_to.forEach(type =>{
+          damageToMods[parseInt(type.url.split('/')[6])-1] = .5;
+        });
+
+        result.body.damage_relations.no_damage_from.forEach(type =>{
+          damageFromMods[parseInt(type.url.split('/')[6])-1] = 0;
+        });
+
+        result.body.damage_relations.no_damage_to.forEach(type =>{
+          damageToMods[parseInt(type.url.split('/')[6])-1] = 0;
+        });
+
+        for(let j=1; j<19; j++) {
+          let SQL = `INSERT INTO types_damage_to(type_id, type_damage_to, type_damage_to_multiplier) VALUES($1, $2, $3)`;
+          let values = [i, j, damageToMods[j-1]];
+          client.query(SQL,values);
+        }
+
+        for(let j=1; j<19; j++) {
+          let SQL = `INSERT INTO types_damage_from(type_id, type_damage_from, type_damage_from_multiplier) VALUES($1, $2, $3)`;
+          let values = [i, j, damageFromMods[j-1]];
+          client.query(SQL,values);
+        }
+      })
+  }
+}
+
 function handleError(error, response) {
   response.render('pages/error', { error: error });
 }
@@ -113,3 +160,4 @@ function handleError(error, response) {
 //   setTimeout(buildPokemonDatabase, i * 2000, i);
 //   console.log(`Added #${i}`);
 // }
+buildTypeDamageMods();
