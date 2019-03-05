@@ -7,7 +7,8 @@
 
   <body>
     <main>
-      <%i include('partials/search-form'%>
+      <%- include('partials/search-form') %>
+      <%- include('partials/row', {result: result}) %>
     </main>
   </body>
 </html>

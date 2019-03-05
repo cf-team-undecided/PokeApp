@@ -30,7 +30,7 @@ app.set('view engine', 'ejs');
 
 app.get('/', (request, response) => response.render('./index'));
 
-// app.get('/search', showSearch );
+app.get('/search', showSearch );
 
 // app.post('/details/:id', displayDetails );
 app.get('/detail', onePoke);
@@ -109,7 +109,15 @@ function getPokemonData(id) {
     })
 }
 
-
+function showSearch(request, response) {
+  let SQL = 'SELECT * FROM species;';
+  return client.query(SQL)
+    .then(result => {
+      console.log('###', result);
+      response.render('./pages/search', {result: result.rows})
+    })
+    .catch(error => handleError(error, response));
+}
 
 function handleError(error, response) {
   response.render('pages/error', { error: error });
