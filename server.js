@@ -211,9 +211,9 @@ function getFlavorText(id) {
       return superagent.get(url)
         .then(result => {
           let newSQL = `INSERT INTO flavor_text(species_id, text) VALUES($1, $2)`;
-          let values = [id, result.body.flavor_text_entries.filter(entry => entry.language.name==='en')[0].flavor_text];
+          let values = [id, result.body.flavor_text_entries.filter(entry => entry.language.name === 'en')[0].flavor_text];
           client.query(newSQL, values);
-          return result.body.flavor_text_entries.filter(entry => entry.language.name==='en')[0].flavor_text
+          return result.body.flavor_text_entries.filter(entry => entry.language.name === 'en')[0].flavor_text
         })
     })
 }
@@ -229,14 +229,29 @@ function onePoke(request, response) {
 
 // Initial database build, should be called iff database is 100% empty
 
-// buildTypeList();
+client.query(`SELECT * FROM types`)
+  .then((result) => {
+    if (result.rows.length === 0) {
+      buildTypeList();
+    }
+  })
 
-// for (let i = 1; i < 808; i++) {
-//   setTimeout(buildPokemonDatabase, i * 2000, i);
-//   console.log(`Added #${i}`);
-// }
-// for (let i = 1; i < 19; i++) {
-//   setTimeout(buildTypeDamageMods, i * 1000, i);
-// }
-// buildTypeDamageMods();
+client.query(`SELECT * FROM species`)
+  .then((result) => {
+    if (result.rows.length === 0)
+      for (let i = 1; i < 808; i++) {
+        setTimeout(buildPokemonDatabase, i * 2000, i);
+        console.log(`Added #${i}`);
+      }
+  })
+
+client.query(`SELECT * FROM types_damage_to`)
+  .then((result) => {
+    if(result.rows.length === 0) {
+      for (let i = 1; i < 19; i++) {
+        setTimeout(buildTypeDamageMods, i * 1000, i);
+      }
+    }
+  })
+
 
