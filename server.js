@@ -117,6 +117,117 @@ function showSearch(request, response) {
       response.render('./pages/search', {result: result.rows})
     })
     .catch(error => handleError(error, response));
+
+function buildTypeDamageMods(i) {
+
+  let url = `https://pokeapi.co/api/v2/type/${i}`;
+  superagent.get(url)
+    .then((result) => {
+      let damageToMods = new Array(18).fill(1);
+      let damageFromMods = new Array(18).fill(1);
+
+      result.body.damage_relations.double_damage_from.forEach(type => {
+        damageFromMods[parseInt(type.url.split('/')[6]) - 1] = 2;
+      });
+
+      result.body.damage_relations.double_damage_to.forEach(type => {
+        damageToMods[parseInt(type.url.split('/')[6]) - 1] = 2;
+      });
+
+      result.body.damage_relations.half_damage_from.forEach(type => {
+        damageFromMods[parseInt(type.url.split('/')[6]) - 1] = .5;
+      });
+
+      result.body.damage_relations.half_damage_to.forEach(type => {
+        damageToMods[parseInt(type.url.split('/')[6]) - 1] = .5;
+      });
+
+      result.body.damage_relations.no_damage_from.forEach(type => {
+        damageFromMods[parseInt(type.url.split('/')[6]) - 1] = 0;
+      });
+
+      result.body.damage_relations.no_damage_to.forEach(type => {
+        damageToMods[parseInt(type.url.split('/')[6]) - 1] = 0;
+      });
+
+      for (let j = 1; j < 19; j++) {
+        let SQL = `INSERT INTO types_damage_to(type_id, type_damage_to, type_damage_to_multiplier) VALUES($1, $2, $3)`;
+        let values = [i, j, damageToMods[j - 1]];
+        client.query(SQL, values);
+      }
+
+      for (let j = 1; j < 19; j++) {
+        let SQL = `INSERT INTO types_damage_from(type_id, type_damage_from, type_damage_from_multiplier) VALUES($1, $2, $3)`;
+        let values = [i, j, damageFromMods[j - 1]];
+        client.query(SQL, values);
+      }
+    })
+}
+
+// If only given a baseType, returns an array of all damage relations of that type
+// If given a baseType AND a targetType, returns the modifier with relation to just that type
+
+function getDamageModifierFrom(baseType, targetType) {
+  // If targetType is specified, give specific result
+  if (targetType) {
+    let SQL = `SELECT type_damage_from, type_damage_from_multipler WHERE type_id=${baseType} AND type_damage_to=${targetType}`
+    client.query(SQL)
+      .then((result) => {
+        return result.rows[0];
+      })
+  }
+
+  // if targetType is not specified, return an array of all reults
+  let SQL = `SELECT type_damage_from, type_damage_from_multipler WHERE type_id=${baseType}`
+  client.query(SQL)
+    .then((results) => {
+      return results.rows;
+    })
+}
+
+// If only given a baseType, returns an array of all damage relations of that type
+// If given a baseType AND a targetType, returns the modifier with relation to just that type
+
+function getDamageModifierTo(baseType, targetType) {
+  // If targetType is specified, give specific result
+  if (targetType) {
+    let SQL = `SELECT type_damage_to, type_damage_to_multipler WHERE type_id=${baseType} AND type_damage_to=${targetType}`
+    client.query(SQL)
+      .then((result) => {
+        return result.rows[0];
+      })
+  }
+
+  // if targetType is not specified, return an array of all reults
+  let SQL = `SELECT type_damage_to, type_damage_to_multipler WHERE type_id=${baseType}`
+  client.query(SQL)
+    .then((results) => {
+      return results.rows;
+    })
+}
+
+// takes the api_id of a type and returns the string name
+function getTypeName(typeId) {
+  let types = ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'];
+  return types[typeId];
+}
+
+function getFlavorText(id) {
+  let SQL = `SELECT text FROM flavor_text WHERE species_id=${id}`;
+  return client.query(SQL)
+    .then((result) => {
+      if (result.rows.length > 0) {
+        return result.rows[0].text
+      }
+      let url = `https://pokeapi.co/api/v2/pokemon-species/${id}`;
+      return superagent.get(url)
+        .then(result => {
+          let newSQL = `INSERT INTO flavor_text(species_id, text) VALUES($1, $2)`;
+          let values = [id, result.body.flavor_text_entries.filter(entry => entry.language.name==='en')[0].flavor_text];
+          client.query(newSQL, values);
+          return result.body.flavor_text_entries.filter(entry => entry.language.name==='en')[0].flavor_text
+        })
+    })
 }
 
 function handleError(error, response) {
@@ -135,3 +246,8 @@ function onePoke(request, response) {
 //   setTimeout(buildPokemonDatabase, i * 2000, i);
 //   console.log(`Added #${i}`);
 // }
+// for (let i = 1; i < 19; i++) {
+//   setTimeout(buildTypeDamageMods, i * 1000, i);
+// }
+// buildTypeDamageMods();
+
