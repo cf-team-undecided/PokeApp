@@ -1,9 +1,8 @@
-DROP TABLE IF EXISTS species, moves_learned, possible_abilities, types_double_damage_to, types_double_damage_from, types_half_damage_to, types_half_damage_from, types_no_damage_to, types_no_damage_from, types, abilities, moves, target_type, damage_class CASCADE;
+DROP TABLE IF EXISTS species, moves_learned, possible_abilities, types_damage_to, types_damage_from, types, abilities, moves, target_type, damage_class CASCADE;
 
 CREATE TABLE IF NOT EXISTS types (
   api_id INTEGER PRIMARY KEY,
-  name VARCHAR(10),
-  damage_class_id INTEGER
+  name VARCHAR(10)
 );
 
 
@@ -37,18 +36,18 @@ CREATE TABLE IF NOT EXISTS moves (
 );
 
 
-  CREATE TABLE IF NOT EXISTS species (
-    national_dex_id INTEGER PRIMARY KEY,
-    name VARCHAR(20),
-    image_url VARCHAR(100),
-    fem_image_url VARCHAR(100),
-    type_primary_id INTEGER,
-    type_secondary_id INTEGER,
-    height INTEGER,
-    weight INTEGER,
-    FOREIGN KEY (type_primary_id) REFERENCES types(api_id),
-    FOREIGN KEY (type_secondary_id) REFERENCES types(api_id)
-  );
+CREATE TABLE IF NOT EXISTS species (
+  national_dex_id INTEGER PRIMARY KEY,
+  name VARCHAR(20),
+  image_url VARCHAR(100),
+  fem_image_url VARCHAR(100),
+  type_primary_id INTEGER,
+  type_secondary_id INTEGER,
+  height INTEGER,
+  weight INTEGER,
+  FOREIGN KEY (type_primary_id) REFERENCES types(api_id),
+  FOREIGN KEY (type_secondary_id) REFERENCES types(api_id)
+);
 
 CREATE TABLE IF NOT EXISTS  moves_learned (
   species_id INTEGER,
@@ -66,45 +65,21 @@ CREATE TABLE IF NOT EXISTS possible_abilities (
   FOREIGN KEY (abilitiy_id) REFERENCES abilities(api_id)
 );
 
-CREATE TABLE IF NOT EXISTS types_double_damage_to (
+CREATE TABLE IF NOT EXISTS types_damage_to (
   type_id INTEGER,
-  type_double_damage_to INTEGER,
+  type_damage_to INTEGER,
+  type_damage_to_multiplier NUMERIC(2,1),
   FOREIGN KEY (type_id) REFERENCES types(api_id),
-  FOREIGN KEY (type_double_damage_to) REFERENCES types(api_id)
+  FOREIGN KEY (type_damage_to) REFERENCES types(api_id)
 );
 
-CREATE TABLE IF NOT EXISTS types_double_damage_from (
+CREATE TABLE IF NOT EXISTS types_damage_from (
   type_id INTEGER,
-  type_double_damage_from INTEGER,
+  type_damage_from INTEGER,
+  type_damage_from_multiplier NUMERIC(2,1),
   FOREIGN KEY (type_id) REFERENCES types(api_id),
-  FOREIGN KEY (type_double_damage_from) REFERENCES types(api_id)
+  FOREIGN KEY (type_damage_from) REFERENCES types(api_id)
 );
 
-CREATE TABLE IF NOT EXISTS types_half_damage_to (
-  type_id INTEGER,
-  type_half_damage_to INTEGER,
-  FOREIGN KEY (type_id) REFERENCES types(api_id),
-  FOREIGN KEY (type_half_damage_to) REFERENCES types(api_id)
-);
 
-CREATE TABLE IF NOT EXISTS types_half_damage_from (
-  type_id INTEGER,
-  type_half_damage_from INTEGER,
-  FOREIGN KEY (type_id) REFERENCES types(api_id),
-  FOREIGN KEY (type_half_damage_from) REFERENCES types(api_id)
-);
-
-CREATE TABLE IF NOT EXISTS types_no_damage_to (
-  type_id INTEGER,
-  type_no_damage_to INTEGER,
-  FOREIGN KEY (type_id) REFERENCES types(api_id),
-  FOREIGN KEY (type_no_damage_to) REFERENCES types(api_id)
-);
-
-CREATE TABLE IF NOT EXISTS types_no_damage_from (
-  type_id INTEGER,
-  type_no_damage_from INTEGER,
-  FOREIGN KEY (type_id) REFERENCES types(api_id),
-  FOREIGN KEY (type_no_damage_from) REFERENCES types(api_id)
-);
-
+INSERT INTO types(api_id, name) VALUES (0, 'none');
