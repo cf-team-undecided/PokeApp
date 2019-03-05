@@ -189,20 +189,28 @@ function getDamageModifierTo(baseType, targetType) {
     })
 }
 
-// sql version isn't working, refactoring
-// function getTypeName(typeId) {
-//   let SQL = `SELECT name FROM types WHERE api_id=${typeId}`;
-//   client.query(SQL)
-//     .then((result) => {
-//       console.log(result.rows[0].name)
-//       return result.rows[0].name;
-//     })
-// }
-
 // takes the api_id of a type and returns the string name
 function getTypeName(typeId) {
   let types = ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'];
   return types[typeId];
+}
+
+function getFlavorText(id) {
+  let SQL = `SELECT text FROM flavor_text WHERE species_id=${id}`;
+  return client.query(SQL)
+    .then((result) => {
+      if (result.rows.length > 0) {
+        return result.rows[0].text
+      }
+      let url = `https://pokeapi.co/api/v2/pokemon-species/${id}`;
+      return superagent.get(url)
+        .then(result => {
+          let newSQL = `INSERT INTO flavor_text(species_id, text) VALUES($1, $2)`;
+          let values = [id, result.body.flavor_text_entries.filter(entry => entry.language.name==='en')[0].flavor_text];
+          client.query(newSQL, values);
+          return result.body.flavor_text_entries.filter(entry => entry.language.name==='en')[0].flavor_text
+        })
+    })
 }
 
 function handleError(error, response) {
