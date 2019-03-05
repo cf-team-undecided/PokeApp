@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PokéSearch</title>
+    <%- include('partials/head') %>
+  </head>
+
+  <body>
+    <main>
+      <%- include('partials/search-form') %>
+      <% result.forEach(pokemon => { %>
+        <a href="/details/<%= pokemon.id %>">
+          <section class="row-wrapper">
+                  <h2> <%=pokemon.name %></h2>
+                  <img src="<%= pokemon.imgURL %>" alt="<%= pokemon.name %>">
+                  <span><%= pokemon.typeOne %></span>
+                  <span><%= pokemon.typeTwo %></span>
+                  <span>Generation: <% if(pokemon.id <= 151) {'I'} %>
+                    <% if(pokemon.id >= 152 && pokemon.id <= 251) {'II'} %>
+                    <% if(pokemon.id >= 252 && pokemon.id <= 386) {'III'} %>
+                    <% if(pokemon.id >= 387 && pokemon.id <= 493) {'IV'} %>
+                    <% if(pokemon.id >= 494 && pokemon.id <= 649) {'V'} %>
+                    <% if(pokemon.id >= 650 && pokemon.id <= 721) {'VI'} %>
+                    <% if(pokemon.id >= 722 && pokemon.id <= 807) {'VII'} %>
+                    <% else{'VIII'}; %>
+                    </span>
+            </section>
+          </a>
+          <% }); %>
+    </main>
+  </body>
+</html>
