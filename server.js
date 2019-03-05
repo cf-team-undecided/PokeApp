@@ -30,9 +30,9 @@ app.set('view engine', 'ejs');
 
 app.get('/', (request, response) => response.render('./index'));
 
-app.get('/search', showSearch );
+// app.get('/search', showSearch );
 
-app.post('/details/:id', displayDetails );
+// app.post('/details/:id', displayDetails );
 
 app.get('*', (request, response) => response.status(404).send('This route does not exist'));
 
@@ -47,19 +47,19 @@ app.listen(PORT, () => console.log(`Listening on ${PORT}`));
 // Helper functions
 //********************
 
-function showSearch {
-  let SQL = `SELECT * ;`;
-  let values = [name, id, typePrimary, typeSecondary, sprite, gen];
+// function showSearch {
+//   let SQL = `SELECT * ;`;
+//   let values = [name, id, typePrimary, typeSecondary, sprite, gen];
 
-  client.query(SQL, values)
-    .then(response.render())
-}
+//   client.query(SQL, values)
+//     .then(response.render())
+// }
 
-function displayDetails {
-  let SQL;
+// function displayDetails {
+//   let SQL;
 
 
-}
+// }
 
 function handleError(error, response) {
   response.render('pages/error', {error: error});
