@@ -1,0 +1,32 @@
+  <div class="wrapper">
+    <div class="top-box">
+      <ul>
+        <li>FIND ME</li>
+        <li>MOVES</li>
+        <li>EVOLVE</li>
+      </ul>
+    </div>
+    <div class="poke-box">
+      <img src="<%= pokemon.imageURL %>" alt="<%= pokemon.name%>">
+      <h2><%= pokemon.id %></h2>
+      <h2><%= pokemon.name %></h2>
+      <span><%= pokemon. %></span>
+      <ul>
+        <li>HT: <%= pokemon.height %>m</li>
+        <li>WT: <%= pokemon.weight %>kg</li>
+      </ul>
+    </div>
+    <div class="type-box">
+      <ul>
+        <li><%= pokemon.typeOne %></li>
+        <li> <%= pokemon.typeTwo %></li>
+      </ul>
+    </div>
+    <div class="weakness-box">
+      <ul>
+        <li><%= pokemon.weakOne %></li>
+        <li><%= pokemon.weakTwo %></li>
+      </ul>
+    </div>
+      <div class="description-box"><%= pokemon.description %></div>
+  </div>
