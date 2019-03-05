@@ -232,6 +232,28 @@ function getFlavorText(id) {
     })
 }
 
+function getMoveData(id) {
+  let SQL = `SELECT * FROM moves WHERE api_id=${id}`;
+  client.query(SQL)
+    .then(result => {
+      if (result.rows.length > 0) {
+        return result.rows[0];
+      }
+      let url = `https://pokeapi.co/api/v2/move/${id}`;
+      superagent.get(url)
+        .then((result) => {
+          let newSQL = `INSERT INTO moves(api_id, name, power, accuracy, target_type_id, damage_class_id, type_id, effect_text) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`;
+          let values = [id, result.body.name, result.body.power, result.body.accuracy, result.body.target.url.split('/')[6], result.body.damage_class.url.split('/')[6], result.body.type.url.split('/')[6], result.body.effect_entries.filter(entry => entry.language.name === 'en')[0].effect];
+
+          return client.query(newSQL, values).then((record => {
+            console.log('Move created: ', record.rows[0]);
+            return record.rows[0];
+          })
+          )
+        })
+    })
+}
+
 function handleError(error, response) {
   response.render('pages/error', { error: error });
 }
@@ -261,7 +283,7 @@ client.query(`SELECT * FROM species`)
 
 client.query(`SELECT * FROM types_damage_to`)
   .then((result) => {
-    if(result.rows.length === 0) {
+    if (result.rows.length === 0) {
       for (let i = 1; i < 19; i++) {
         setTimeout(buildTypeDamageMods, i * 1000, i);
       }
@@ -270,7 +292,7 @@ client.query(`SELECT * FROM types_damage_to`)
 
 client.query(`SELECT * FROM target_type`)
   .then((result) => {
-    if(result.rows.length === 0) {
+    if (result.rows.length === 0) {
       buildTargetTypes();
     }
   })
