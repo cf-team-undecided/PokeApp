@@ -1,26 +1,82 @@
-main {
-  background-color: yellow;
-
+body{
+  margin: auto;
+}
+body {
+  max-width: 425px;
+  margin-left: auto;
 }
 
-h1 {
-  font-size: 3.2rem;
-  font-weight: bold;
-  text-shadow: 2px 2px white;
-
+.wrapper {
+  background: #37505C;
+  display: grid;
+  grid-template-rows: 40px 150px 40px 40px 150px;
+  grid-gap: 5px;
+  grid-template-columns: 5% 90% 5%;
 }
 
-p {
-  font-size: 1.6rem;
-
+.wrapper ul {
+  text-align: center;
 }
 
-div {
-  max-width: 50%;
-
+.wrapper li {
+  display: inline;
 }
 
-@media screen and (min-width: 480px) and (max-width: 767px) {
+.top-box li {
+}
+
+.wrapper ul li {
+  color: white;
+}
+
+.top-box {
+  background-color: #101935;
+  grid-area: 1 / 1 / 1 / 4;
+}
+
+.poke-box {
+  background-color: #DBCBD8;
+  grid-area: 2 / 2 / 2 / 2;
+}
+
+.poke-box img {
+  float: left;
+  width: 40%;
+  height: 60%;
+}
+
+.poke-box span {
+  display: block;
+}
+
+.type-box {
+  grid-area: 3 / 1 / 3 / 4;
+}
+
+.type-box li {
+  border-radius: 10px;
+  background: grey;
+}
+
+.against-box {
+  grid-area: 4 / 1 / 4 / 4;
+}
+
+.against-box span {
+  border-radius: 10px;
+  background: brown;
+}
+
+.description-box {
+  background-color: #DBCBD8;
+  grid-area: 5 / 1 / 5 / 4;
+}
+
+
+
+
+
+@media screen and (min-width: 425px) and (max-width: 767px) {
   main {
     background-color: orange;
 
@@ -33,3 +89,5 @@ div {
 
   }
 }
+
+

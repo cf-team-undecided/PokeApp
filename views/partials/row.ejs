@@ -1,0 +1,13 @@
+    <section class="wrapper">
+      <ul class="pokemon-list">
+        <% result.forEach(pokemon => { %>
+          <li class="pokemon-item">
+            <h2> <%=pokemon.name %></h2>
+            <img src="<%= pokemon.img_url %>" alt="<%= pokemon.name %>">
+            <span><%= pokemon.typeOne %></span>
+            <span><%= pokemon.typeTwo %></span>
+            <span>Generation: </span>
+          </li>
+          <% }); %>
+      </ul>
+    </section>

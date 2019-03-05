@@ -1,29 +1,4 @@
 * {
   box-sizing: border-box;
-  font-size: 62.5%;
-  
-}
-
-body {
-  width: 40rem;
-  margin: 0 auto;
-
-}
-
-@media screen and (min-width: 480px) and (max-width: 767px) {
-  body {
-    width: 48rem;
-    margin: 0 auto;
-
-  }
-}
-
-@media screen and (min-width: 768px) {
-  body {
-    max-width: 96rem;
-    margin: 0 auto;
-    background-color: white;
-    background: url(http://pokemipsum.com/img/pikachu.gif) repeat;
-  
-  }
+  overflow: hidden;
 }
