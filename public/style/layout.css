@@ -1,9 +1,6 @@
 body{
   margin: auto;
-}
-body {
   max-width: 425px;
-  margin-left: auto;
 }
 
 .wrapper {
@@ -68,9 +65,6 @@ body {
   background-color: #DBCBD8;
   grid-area: 5 / 1 / 5 / 4;
 }
-
-
-
 
 
 @media screen and (min-width: 425px) and (max-width: 767px) {
