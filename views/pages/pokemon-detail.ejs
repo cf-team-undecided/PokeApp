@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <%- include('./../partials/head') %>
-</head>
-<body>
-  <%- include('./..//partials/header') %>
-  <div class="wrapper">
+  <head>
+    <%- include('../partials/head') %>
+    <link rel="stylesheet" type="text/css" href="/style/modules/favorite-button.css" />
+  </head>
+  <body>
+      <%- include('../partials/favorite-button') %>
+      <%- include('../partials/header') %>
+    <div class="wrapper">
       <div class="top-box">
         <ul>
           <li>FIND ME</li>
@@ -38,5 +40,6 @@
       </div>
         <div class="description-box">It eats nearly 900 pounds of food every day. It starts nodding off while eating—and continues to eat even while it’s asleep.</div>
     </div>
-</body>
+    <%- include('../partials/jquery')%>
+    </body>
 </html>

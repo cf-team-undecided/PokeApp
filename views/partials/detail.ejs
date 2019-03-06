@@ -6,6 +6,7 @@
         <li>EVOLVE</li>
       </ul>
     </div>
+    <%- include('../partials/favorite-button') %>
     <div class="poke-box">
       <img src="<%= pokemon.imageURL %>" alt="<%= pokemon.name%>">
       <h2><%= pokemon.id %></h2>
@@ -28,5 +29,7 @@
         <li><%= pokemon.weakTwo %></li>
       </ul>
     </div>
-      <div class="description-box"><%= pokemon.description %></div>
+    <div class="description-box"><%= pokemon.description %></div>
   </div>
+
+  <%- include('jquery')%>

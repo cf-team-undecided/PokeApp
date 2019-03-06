@@ -35,6 +35,10 @@ app.get('/search', showSearch );
 // app.post('/details/:id', displayDetails );
 app.get('/detail', onePoke);
 
+app.post('/add', addFavorite);
+
+app.post('/delete', deleteFavorite);
+
 app.get('*', (request, response) => response.status(404).send('This route does not exist'));
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
@@ -119,6 +123,22 @@ function showSearch(request, response) {
     .catch(error => handleError(error, response));
 }
 
+function addFavorite(request, response) {
+  let SQL = `INSERT INTO favorites (id) VALUES ($1);`;
+  let values = [request.query.data];
+
+  client.query(SQL, values)
+    .then(result => response.send(result))
+}
+
+function deleteFavorite(request, response) {
+  let SQL = `DELETE FROM favorites WHERE ($1);`;
+  let values = [request.query.data];
+
+  client.query(SQL, values)
+    .then(result => response.send(result))
+}
+
 function handleError(error, response) {
   response.render('pages/error', { error: error });
 }
@@ -127,6 +147,7 @@ function onePoke(request, response) {
   response.render('./pages/pokemon-detail');
   app.use(express.static('./public'));
 }
+
 // Initial database build, should be called iff database is 100% empty
 
 // buildTypeList();

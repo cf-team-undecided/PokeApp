@@ -2,13 +2,13 @@
 <html>
   <head>
     <title>PokéSearch</title>
-    <%- include('partials/head') %>
+    <%- include('../partials/head') %>
   </head>
 
   <body>
+    <header><%- include('../partials/header')%></header>
     <main>
-      <%- include('partials/search-form') %>
-      <%- include('partials/row', {result: result}) %>
+      <%- include('../partials/search-form') %>
     </main>
   </body>
 </html>
