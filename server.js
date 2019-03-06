@@ -122,7 +122,12 @@ function changedArrayToPrepareForEJSRender (arr) {
 
 function showSearch(request, response) {
   // let SQL = 'SELECT * FROM species;'
-  let SQL = 'SELECT * FROM species ORDER BY national_dex_id OFFSET 10 ROWS FETCH NEXT 10 ROWS ONLY;';
+  // let SQL = 'SELECT * FROM species ORDER BY national_dex_id OFFSET 10 ROWS FETCH NEXT 10 ROWS ONLY;';
+
+  let SQL = 'SELECT * FROM species ORDER BY national_dex_id OFFSET ';
+  if (request.body.pages){ SQL += `${parseInt(request.body.pages)} * 20 ROWS FETCH NEXT 20 ROWS`}
+  
+
   return client.query(SQL)
     .then(result => {
       response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
