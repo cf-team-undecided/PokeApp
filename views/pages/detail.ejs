@@ -1,11 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include('../partials/head') %>
+    <link rel="stylesheet" type="text/css" href="/style/modules/favorite-button.css" />
+  </head>
+  <body>
+      <%- include('../partials/favorite-button') %>
+      <%- include('../partials/header') %>
   <div class="wrapper">
-    <div class="top-box">
-      <ul>
-        <li>FIND ME</li>
-        <li>MOVES</li>
-        <li>EVOLVE</li>
-      </ul>
-    </div>
     <%- include('../partials/favorite-button') %>
     <div class="poke-box">
       <img src="<%= pokemon.imageURL %>" alt="<%= pokemon.name%>">
@@ -32,4 +34,6 @@
     <div class="description-box"><%= pokemon.description %></div>
   </div>
 
-  <%- include('jquery')%>
+  <%- include('../partials/jquery')%>
+</body>
+</html>
