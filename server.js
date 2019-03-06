@@ -121,7 +121,7 @@ function changedArrayToPrepareForEJSRender (arr) {
 }
 
 function showSearch(request, response) {
-  let SQL = 'SELECT * FROM species LIMIT 10;';
+  let SQL = 'SELECT * FROM species;';
   return client.query(SQL)
     .then(result => {
       response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
@@ -131,16 +131,17 @@ function showSearch(request, response) {
 }
 
 function searchBy(request, response) {
-  // let SQL = 'SELECT * FROM species WHERE ';
-  console.log(request.body.search);
+  let SQL = 'SELECT * FROM species WHERE ';
+  console.log('135', request.body.search);
+  if(request.body.search) {SQL += `name='${request.body.search}'`}
   // if(request.body.search[1] === 'name') {SQL += `name='${request.body.search[0]}'`}
-  // if(request.body.search[1] === 'type') {SQL += 'type='}
-  // return client.query(SQL)
-  //   .then(result => {
-  //     response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
-  //     )
-  //     // .catch(error => handleError(error, response));
-  //   })
+  if(request.body.search === '') {SQL += `type_primary_id='${parseInt(request.body.types)}'`}
+  return client.query(SQL)
+    .then(result => {
+      response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
+      )
+      // .catch(error => handleError(error, response));
+    })
 }
 
 function buildTypeDamageMods(i) {
