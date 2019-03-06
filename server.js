@@ -35,6 +35,8 @@ app.get('/search', showSearch );
 // app.post('/details/:id', displayDetails );
 app.get('/detail', onePoke);
 
+app.post('/searchBy', searchBy);
+
 app.get('*', (request, response) => response.status(404).send('This route does not exist'));
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
@@ -113,25 +115,30 @@ function changedArrayToPrepareForEJSRender (arr) {
   return arr.map(type =>{
     let whole = type;
 
-    // whole.type_primary_id =  getTypeName(type.type_primary_id); 
+    // whole.type_primary_id =  getTypeName(type.type_primary_id);
     // console.log(whole);
   })
-} 
-
-let test;
+}
 
 function showSearch(request, response) {
   let SQL = 'SELECT * FROM species LIMIT 10;';
   return client.query(SQL)
     .then(result => {
-      // let changedArray = changedArrayToPrepareForEJSRender(result.rows);
-      // console.log(changedArray);
-
-
       response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
-    )
-    .catch(error => handleError(error, response));
-  }) 
+      )
+      // .catch(error => handleError(error, response));
+    })
+}
+
+function searchBy(request, response) {
+  let SQL = 'SELECT * FROM species WHERE ';
+  if(request.body.search[1] === 'name') {SQL += `name='${request.body.search[0]}'`}
+  return client.query(SQL)
+    .then(result => {
+      response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
+      )
+      // .catch(error => handleError(error, response));
+    })
 }
 
 function buildTypeDamageMods(i) {
