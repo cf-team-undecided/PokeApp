@@ -1,14 +1,26 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>PokéSearch</title>
-    <%- include('../partials/head') %>
-  </head>
 
-  <body>
-    <header><%- include('../partials/header')%></header>
-    <main>
-      <%- include('../partials/search-form') %>
-    </main>
-  </body>
+<head>
+  <title>PokéSearch</title>
+  <%- include('../partials/head') %>
+</head>
+
+<body>
+  <main>
+    <%- include('../partials/search-form') %>
+    <% result.forEach(pokemon => { %>
+    <a href="/details/<%= pokemon.national_dex_id %>">
+      <section class="row-wrapper">
+        <h2> <%=pokemon.name %></h2>
+        <img src="<%= pokemon.image_url %>" alt="<%= pokemon.name %>">
+        <span><%= types[pokemon.type_primary_id] %></span>
+
+
+      </section>
+    </a>
+    <% }); %>
+  </main>
+</body>
+
 </html>
