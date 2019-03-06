@@ -131,14 +131,16 @@ function showSearch(request, response) {
 }
 
 function searchBy(request, response) {
-  let SQL = 'SELECT * FROM species WHERE ';
-  if(request.body.search[1] === 'name') {SQL += `name='${request.body.search[0]}'`}
-  return client.query(SQL)
-    .then(result => {
-      response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
-      )
-      // .catch(error => handleError(error, response));
-    })
+  // let SQL = 'SELECT * FROM species WHERE ';
+  console.log(request.body.search);
+  // if(request.body.search[1] === 'name') {SQL += `name='${request.body.search[0]}'`}
+  // if(request.body.search[1] === 'type') {SQL += 'type='}
+  // return client.query(SQL)
+  //   .then(result => {
+  //     response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
+  //     )
+  //     // .catch(error => handleError(error, response));
+  //   })
 }
 
 function buildTypeDamageMods(i) {
