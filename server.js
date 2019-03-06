@@ -121,20 +121,20 @@ function changedArrayToPrepareForEJSRender (arr) {
 }
 
 function showSearch(request, response) {
-  let SQL = 'SELECT * FROM species;';
+  // let SQL = 'SELECT * FROM species;'
+  let SQL = 'SELECT * FROM species ORDER BY national_dex_id OFFSET 10 ROWS FETCH NEXT 10 ROWS ONLY;';
   return client.query(SQL)
     .then(result => {
       response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
       )
       // .catch(error => handleError(error, response));
-    })
+    });
 }
 
 function searchBy(request, response) {
   let SQL = 'SELECT * FROM species WHERE ';
   console.log('135', request.body.search);
   if(request.body.search) {SQL += `name='${request.body.search}'`}
-  // if(request.body.search[1] === 'name') {SQL += `name='${request.body.search[0]}'`}
   if(request.body.search === '') {SQL += `type_primary_id='${parseInt(request.body.types)}'`}
   return client.query(SQL)
     .then(result => {
