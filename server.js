@@ -118,6 +118,8 @@ function changedArrayToPrepareForEJSRender (arr) {
   })
 } 
 
+let test;
+
 function showSearch(request, response) {
   let SQL = 'SELECT * FROM species LIMIT 10;';
   return client.query(SQL)
