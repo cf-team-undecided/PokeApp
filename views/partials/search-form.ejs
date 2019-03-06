@@ -1,3 +1,18 @@
 <form action="/searchBy" method="POST">
+<<<<<<< HEAD
   <input type="text" placeholder="Enter a pokemon" name="search"></input>
+=======
+  <input type="text" placeholder="Enter search here..." name="search"></input>
+  <fieldset>
+    <label for="name">
+      <span>Name</span>
+      <input type="radio" name="search" value="name" required>
+    </label>
+    <label for="generation">
+      <span>Generation</span>
+      <input type="radio" name="search" value="generation" required>
+    </label>
+    <%- include('typeDropDown') %>
+  </fieldset>
+>>>>>>> 43522e6c19844b376638c43c3987d15983550726
 </form>
