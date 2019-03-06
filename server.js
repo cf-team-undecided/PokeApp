@@ -32,6 +32,8 @@ app.get('/', (request, response) => response.render('./index'));
 
 app.get('/search', showSearch );
 
+app.post('/search', showSearch);
+
 // app.post('/details/:id', displayDetails );
 app.get('/detail', onePoke);
 
