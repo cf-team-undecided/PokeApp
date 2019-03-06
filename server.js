@@ -80,11 +80,41 @@ function PokemonDetails(pokemon) {
 function displayDetails(request, response) {
   let SQL = `SELECT * FROM species WHERE id=$1`
   let value = [request.params.id];
-  let Pokemon = {};
 
   client.query(SQL, value)
-    .then( (details) => {
-      let 
+    .then( (results) => {
+      let details = new PokemonDetails(results.rows[0])
+      getDamageMods(details.typeOne, details.typeTwo)
+        .then( (modResults) => {
+          modResults.forEach( (val, idx) => {
+            if( val > 1 ) {
+              details.weak.push(getTypeName(idx));
+            }
+            if( val < 1 ) {
+              details.strong.push(getTypeName(idx));
+            }
+          })
+
+          getFlavorText(detail.id)
+            .then( (flavorResults))
+              let url = `https://pokeapi.co/api/v2/pokemon/${details.id}`;
+              details.description = flavorResults.split('\n').join(' ')
+
+              superagent.get(url)
+                .then(apiResponse => {
+                  apiResponse.body.moves.forEach( (move) => {
+                    let moveArr = [];
+                    if(move.version_group_details[0].level_learned_at >= 1) {
+                      moveArr.push(move.version_group_details[0].level_learned_at);
+                      moveArr.push(move.name);
+                      details.moves.push(moveArr);
+                    }
+                })
+                
+                response.render(`pages/detail/${value}`, {details: pokemon} )
+                .catch(err => handleError(err, response))
+              })
+        })
   })
 }
 
@@ -234,7 +264,7 @@ function getDamageMods(typeOne, typeTwo) {
   let typeOneIndex = typeList.indexOf(typeOne);
   let typeTwoIndex = typeList.indexOf(typeTwo);
 
-  let output = new Array(18).fill(1);
+  let output = new Array(19).fill(1);
 
   let typeOneModList = [];
   let typeTwoModList = [];
@@ -248,6 +278,7 @@ function getDamageMods(typeOne, typeTwo) {
           output = output.map((element, index) => {
             {return element * typeOneResult[index] * typeTwoResult[index]};
           })
+          return output;
         })
     })
 }

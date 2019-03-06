@@ -46,13 +46,11 @@
         <tr>
           <th>Level Learned</th>
           <th>Name</th>
-          <th>Type</th>
         </tr>
         <%= pokemon.moves.forEach( move => { %>
         <tr>
           <td><%= move.level %></td>
           <td><%= move.name %></td>
-          <td><div class="<%= move.type %>"><%= move.type %></div></td>
         </tr>
         <% }) %>
       </table>
