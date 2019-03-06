@@ -215,7 +215,7 @@ function getDamageModifierFrom(baseType, targetType) {
   // If targetType is specified, give specific result
   if (targetType) {
     let SQL = `SELECT type_damage_from, type_damage_from_multipler WHERE type_id=${baseType} AND type_damage_to=${targetType}`
-    client.query(SQL)
+    return client.query(SQL)
       .then((result) => {
         return result.rows[0];
       })
@@ -223,9 +223,32 @@ function getDamageModifierFrom(baseType, targetType) {
 
   // if targetType is not specified, return an array of all reults
   let SQL = `SELECT type_damage_from, type_damage_from_multipler WHERE type_id=${baseType}`
-  client.query(SQL)
+  return client.query(SQL)
     .then((results) => {
       return results.rows;
+    })
+}
+
+function getDamageMods(typeOne, typeTwo) {
+  let typeList = ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'];
+  let typeOneIndex = typeList.indexOf(typeOne);
+  let typeTwoIndex = typeList.indexOf(typeTwo);
+
+  let output = new Array(18).fill(1);
+
+  let typeOneModList = [];
+  let typeTwoModList = [];
+  client.query(`SELECT type_damage_from_multiplier FROM types_damage_from WHERE type+id=${typeOneIndex};`)
+    .then((typeOneResult) => {
+      typeOneModList = typeOneResult.rows.map((row) => {return row.type_damage_from_multiplier});
+      client.query(`SELECT type_damage_from_multiplier FROM types_damage_from WHERE type+id=${typeTwoIndex};`)
+        .then((typeTwoResult) => {
+          typeTwoResult = typeTwoResult.rows.map((row) => {return row.type_damage_from_multiplier});
+
+          output = output.map((element, index) => {
+            {return element * typeOneResult[index] * typeTwoResult[index]};
+          })
+        })
     })
 }
 
