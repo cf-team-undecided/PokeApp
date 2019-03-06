@@ -32,8 +32,8 @@ app.get('/', (request, response) => response.render('./index'));
 
 app.get('/search', showSearch );
 
-// app.post('/details/:id', displayDetails );
-app.get('/detail', onePoke);
+app.get('/details/:id', displayDetails );
+// app.get('/detail', onePoke);
 
 app.post('/add', addFavorite);
 
@@ -58,9 +58,35 @@ function Pokemon(pokemon, typeOne, typeTwo) {
   this.typeTwo = typeTwo;
 }
 
+function PokemonDetails(pokemon) {
+  this.image_url = pokemon.image_url;
+  this.id = pokemon.national_dex_id;
+  this.name = pokemon.name;
+  this.height = pokemon.height;
+  this.weight = pokemon.weight;
+  this.typeOne = getTypeName(pokemon.type_primary_id);
+  this.typeTwo = getTypeName(pokemon.type_secondary_id);
+  this.strong = [];
+  this.weak = [];
+  this.description = '';
+  this.moves = [];
+
+}
+
 //********************
 // Helper functions
 //********************
+
+function displayDetails(request, response) {
+  let SQL = `SELECT * FROM species WHERE id=$1`
+  let value = [request.params.id];
+  let Pokemon = {};
+
+  client.query(SQL, value)
+    .then( (details) => {
+      let 
+  })
+}
 
 function buildPokemonDatabase(id) {
 
@@ -304,41 +330,44 @@ function handleError(error, response) {
   response.render('pages/error', { error: error });
 }
 
-function onePoke(request, response) {
-  response.render('./pages/pokemon-detail');
-  app.use(express.static('./public'));
-}
+// function onePoke(request, response) {
+//   response.render('./pages/pokemon-detail');
+//   app.use(express.static('./public'));
+// }
 
 // Initial database build, should be called iff database is 100% empty
-
-client.query(`SELECT * FROM types`)
-  .then((result) => {
-    if (result.rows.length === 0) {
-      buildTypeList();
-    }
-  })
-
-client.query(`SELECT * FROM species`)
-  .then((result) => {
-    if (result.rows.length === 0)
-      for (let i = 1; i < 808; i++) {
-        setTimeout(buildPokemonDatabase, i * 2000, i);
-        console.log(`Added #${i}`);
+function buildIfEmpty {
+  client.query(`SELECT * FROM types`)
+    .then((result) => {
+      if (result.rows.length === 0) {
+        buildTypeList();
       }
-  })
+    })
 
-client.query(`SELECT * FROM types_damage_to`)
-  .then((result) => {
-    if (result.rows.length === 0) {
-      for (let i = 1; i < 19; i++) {
-        setTimeout(buildTypeDamageMods, i * 1000, i);
+  client.query(`SELECT * FROM species`)
+    .then((result) => {
+      if (result.rows.length === 0)
+        for (let i = 1; i < 808; i++) {
+          setTimeout(buildPokemonDatabase, i * 2000, i);
+          console.log(`Added #${i}`);
+        }
+    })
+
+  client.query(`SELECT * FROM types_damage_to`)
+    .then((result) => {
+      if (result.rows.length === 0) {
+        for (let i = 1; i < 19; i++) {
+          setTimeout(buildTypeDamageMods, i * 1000, i);
+        }
       }
-    }
-  })
+    })
 
-client.query(`SELECT * FROM target_type`)
-  .then((result) => {
-    if (result.rows.length === 0) {
-      buildTargetTypes();
-    }
-  })
+  client.query(`SELECT * FROM target_type`)
+    .then((result) => {
+      if (result.rows.length === 0) {
+        buildTargetTypes();
+      }
+    })
+}
+
+buildIfEmpty();

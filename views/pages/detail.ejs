@@ -5,33 +5,58 @@
     <link rel="stylesheet" type="text/css" href="/style/modules/favorite-button.css" />
   </head>
   <body>
-      <%- include('../partials/favorite-button') %>
-      <%- include('../partials/header') %>
+  <%- include('../partials/favorite-button') %>
+  <%- include('../partials/header') %>
   <div class="wrapper">
-    <%- include('../partials/favorite-button') %>
     <div class="poke-box">
-      <img src="<%= pokemon.imageURL %>" alt="<%= pokemon.name%>">
+      <%- include('../partials/favorite-button') %>
+      <img src="<%= pokemon.image_url %>" alt="<%= pokemon.name%>">
       <h2><%= pokemon.id %></h2>
       <h2><%= pokemon.name %></h2>
-      <span><%= pokemon.species %></span>
       <ul>
         <li>HT: <%= pokemon.height %>m</li>
         <li>WT: <%= pokemon.weight %>kg</li>
       </ul>
+      <div class="type-box">
+        <ul>
+          <li> <%= pokemon.typeOne %></li>
+          <li> <%= pokemon.typeTwo %></li>
+        </ul>
+      </div>
     </div>
-    <div class="type-box">
+    <div class="strength-box">
       <ul>
-        <li><%= pokemon.typeOne %></li>
-        <li> <%= pokemon.typeTwo %></li>
+        <li>Strong against: </li>
+        <%= pokemon.strong.forEach(strong => { %>
+        <li class="<%= strong %>"><%= strong %></li>
+        <% }) %>
       </ul>
     </div>
     <div class="weakness-box">
       <ul>
-        <li><%= pokemon.weakOne %></li>
-        <li><%= pokemon.weakTwo %></li>
+        <li>Weak against: </li>
+        <%= pokemon.weak.forEach( weak => { %>
+        <li class="<%= weak %>"><%= weak %></li>
+        <% }) %>
       </ul>
     </div>
     <div class="description-box"><%= pokemon.description %></div>
+    <div class="move-box">
+      <table>
+        <tr>
+          <th>Level Learned</th>
+          <th>Name</th>
+          <th>Type</th>
+        </tr>
+        <%= pokemon.moves.forEach( move => { %>
+        <tr>
+          <td><%= move.level %></td>
+          <td><%= move.name %></td>
+          <td><div class="<%= move.type %>"><%= move.type %></div></td>
+        </tr>
+        <% }) %>
+      </table>
+    </div>
   </div>
 
   <%- include('../partials/jquery')%>
