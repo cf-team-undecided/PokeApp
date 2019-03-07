@@ -1,20 +1,7 @@
-<% result.forEach(pokemon => { %>
-  <%- include('./favorite-button') %>
-  <a href="/details/<%= pokemon.national_dex_id %>">
-    <section class="row-wrapper">
-      <h2> <%=pokemon.name %></h2>
-      <img src="<%= pokemon.image_url %>" alt="<%= pokemon.name %>">
-      <span><%= pokemon.typeOne %></span>
-      <span><%= pokemon.typeTwo %></span>
-      <span>Generation: <% if(pokemon.national_dex_id <= 151) {'I'} %>
-        <% if(pokemon.national_dex_id >= 152 && pokemon.national_dex_id <= 251) {'II'} %>
-        <% if(pokemon.national_dex_id >= 252 && pokemon.national_dex_id <= 386) {'III'} %>
-        <% if(pokemon.national_dex_id >= 387 && pokemon.national_dex_id <= 493) {'IV'} %>
-        <% if(pokemon.national_dex_id >= 494 && pokemon.national_dex_id <= 649) {'V'} %>
-        <% if(pokemon.national_dex_id >= 650 && pokemon.national_dex_id <= 721) {'VI'} %>
-        <% if(pokemon.national_dex_id >= 722 && pokemon.national_dex_id <= 807) {'VII'} %>
-        <% else{'VIII'}; %>
-      </span>
-    </section>
-  </a>
-  <% }); %>
+<a href="/details/<%= pokemon.national_dex_id %>">
+  <section class="row">
+    <h2 class="pokemon-title"> <%=pokemon.name %></h2>
+    <img src="<%= pokemon.image_url %>" alt="<%= pokemon.name %>">
+    <span><%= types[pokemon.type_primary_id] %></span>
+  </section>
+</a>
