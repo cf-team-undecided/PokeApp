@@ -39,6 +39,8 @@ app.post('/add/:id', addFavorite);
 
 app.delete('/delete/:id', deleteFavorite);
 
+app.post('/searchBy', searchBy);
+
 app.get('*', (request, response) => response.status(404).send('This route does not exist'));
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
@@ -174,19 +176,35 @@ function changedArrayToPrepareForEJSRender (arr) {
   return arr.map(type =>{
     let whole = type;
 
-    // whole.type_primary_id =  getTypeName(type.type_primary_id); 
+    // whole.type_primary_id =  getTypeName(type.type_primary_id);
     // console.log(whole);
   })
-} 
+}
+
+
 
 function showSearch(request, response) {
-  let SQL = 'SELECT * FROM species LIMIT 10;';
+  console.log(request.body.pages);
+  let SQL = 'SELECT * FROM species ';
+  if (request.body.pages === undefined){SQL += 'LIMIT 20'}
+  if (request.body.pages){ SQL += `ORDER BY national_dex_id OFFSET ${parseInt(request.body.pages)* 20} FETCH NEXT 20 ROWS ONLY`}
+  console.log(SQL);
+
   return client.query(SQL)
     .then(result => {
-      // let changedArray = changedArrayToPrepareForEJSRender(result.rows);
-      // console.log(changedArray);
+      response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
+      )
+      // .catch(error => handleError(error, response));
+    });
+}
 
-
+function searchBy(request, response) {
+  let SQL = 'SELECT * FROM species WHERE ';
+  console.log('135', request.body.search);
+  if(request.body.search) {SQL += `name='${request.body.search}'`}
+  if(request.body.search === '') {SQL += `type_primary_id='${parseInt(request.body.types)}'`}
+  return client.query(SQL)
+    .then(result => {
       response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
       )
         .catch(error => handleError(error, response));

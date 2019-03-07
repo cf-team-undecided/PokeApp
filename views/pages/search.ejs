@@ -16,11 +16,11 @@
         <img src="<%= pokemon.image_url %>" alt="<%= pokemon.name %>">
         <span><%= types[pokemon.type_primary_id] %></span>
 
-
       </section>
     </a>
     <% }); %>
   </main>
+  <%- include('../partials/page-numbers') %>
 </body>
 
 </html>
