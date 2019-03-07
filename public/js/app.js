@@ -27,11 +27,10 @@ function deleteFavorite(event) {
   $.ajax({
     url: '/delete',
     method: 'DELETE',
-    data: {data: del}
-  })
-    .then(val => {
-      $('#favorite-text').addClass(val)
+    data: {data: del},
+    success: function(result) {
+      $('#favorite-text').addClass(result)
       $('#favorite-text').nextAll('.toggle').toggle();
-    })
-
+    }
+  })
 }

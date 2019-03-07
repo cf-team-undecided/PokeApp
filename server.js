@@ -142,6 +142,14 @@ function displayDetails(request, response) {
     })
 }
 
+function getRandomPokemon() {
+  let SQL = `SELECT * FROM species WHERE id=$1;`;
+  let randomPokemon = Math.ceil(Math.random() * Math.ceil(807));
+  let value = [randomPokemon];
+
+  return client.query(SQL, value);
+}
+
 function buildPokemonDatabase(id) {
 
   let url = `https://pokeapi.co/api/v2/pokemon-species/${id}`;
