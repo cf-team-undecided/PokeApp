@@ -32,6 +32,8 @@ app.get('/', (request, response) => response.render('./index'));
 
 app.get('/search', showSearch);
 
+app.post('/search', showSearch);
+
 app.get('/details/:id', displayDetails);
 
 app.post('/add/:id', addFavorite);
