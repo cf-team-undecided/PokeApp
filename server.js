@@ -30,10 +30,9 @@ app.set('view engine', 'ejs');
 
 app.get('/', (request, response) => response.render('./index'));
 
-app.get('/search', showSearch );
+app.get('/search', showSearch);
 
-app.get('/details/:id', displayDetails );
-// app.get('/detail', onePoke);
+app.get('/details/:id', displayDetails);
 
 app.post('/add/:id', addFavorite);
 
