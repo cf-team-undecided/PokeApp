@@ -115,7 +115,7 @@ function displayDetails(request, response) {
                   })
                   details.moves.sort( (a, b) => a[0] - b[0])
                   response.render(`pages/detail`, {pokemon: details} )
-                    .catch(err => handleError(err, response))
+                  // .catch(err => handleError(err, response))
                 })
             })
         })
@@ -182,8 +182,6 @@ function changedArrayToPrepareForEJSRender (arr) {
   })
 }
 
-
-
 function showSearch(request, response) {
   console.log(request.body.pages);
   let SQL = 'SELECT * FROM species ';
@@ -208,8 +206,8 @@ function searchBy(request, response) {
     .then(result => {
       response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
       )
-        .catch(error => handleError(error, response));
-    }) 
+      // .catch(error => handleError(error, response));
+    })
 }
 
 function buildTypeDamageMods(i) {
