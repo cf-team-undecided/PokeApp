@@ -122,13 +122,14 @@ function changedArrayToPrepareForEJSRender (arr) {
   })
 }
 
-function showSearch(request, response) {
-  // let SQL = 'SELECT * FROM species;'
-  // let SQL = 'SELECT * FROM species ORDER BY national_dex_id OFFSET 10 ROWS FETCH NEXT 10 ROWS ONLY;';
 
-  let SQL = 'SELECT * FROM species ORDER BY national_dex_id OFFSET ';
-  if (request.body.pages){ SQL += `${parseInt(request.body.pages)} * 20 ROWS FETCH NEXT 20 ROWS`}
-  
+
+function showSearch(request, response) {
+  console.log(request.body.pages);
+  let SQL = 'SELECT * FROM species ';
+  if (request.body.pages === undefined){SQL += 'LIMIT 20'}
+  if (request.body.pages){ SQL += `ORDER BY national_dex_id OFFSET ${parseInt(request.body.pages)* 20} FETCH NEXT 20 ROWS ONLY`}
+  console.log(SQL);
 
   return client.query(SQL)
     .then(result => {
