@@ -1,0 +1,8 @@
+<form class="toggle" action="/add" value="post" >
+  <input type="hidden" name="id" id="add" value="<%= pokemon.id %>" />
+  <button class="star" id="add-favorite" type="submit"><span>&#9734</span></button>
+</form>
+<form class="hidden toggle" action="/delete" value="delete" >
+  <input type="hidden" name="id" id="delete" value="<%= pokemon.id %>" />
+  <button class="star" id="delete-favorite" type="submit"><span>&#9733</span></button>
+</form>

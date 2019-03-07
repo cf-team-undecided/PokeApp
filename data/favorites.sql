@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS favorites;
+
+CREATE TABLE IF NOT EXISTS favorites (
+  id INTEGER PRIMARY KEY
+);

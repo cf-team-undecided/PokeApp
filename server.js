@@ -32,10 +32,12 @@ app.get('/', (request, response) => response.render('./index'));
 
 app.get('/search', showSearch );
 
-app.post('/search', showSearch);
+app.get('/details/:id', displayDetails );
+// app.get('/detail', onePoke);
 
-// app.post('/details/:id', displayDetails );
-app.get('/detail', onePoke);
+app.post('/add/:id', addFavorite);
+
+app.delete('/delete/:id', deleteFavorite);
 
 app.post('/searchBy', searchBy);
 
@@ -58,9 +60,66 @@ function Pokemon(pokemon, typeOne, typeTwo) {
   this.typeTwo = typeTwo;
 }
 
+function PokemonDetails(pokemon) {
+  this.image_url = pokemon.image_url;
+  this.id = pokemon.national_dex_id;
+  this.name = pokemon.name;
+  this.height = pokemon.height;
+  this.weight = pokemon.weight;
+  this.typeOne = getTypeName(pokemon.type_primary_id);
+  this.typeTwo = getTypeName(pokemon.type_secondary_id);
+  this.strong = [];
+  this.weak = [];
+  this.description = '';
+  this.moves = [];
+
+}
+
 //********************
 // Helper functions
 //********************
+
+function displayDetails(request, response) {
+  let SQL = `SELECT * FROM species WHERE national_dex_id=$1`
+  let value = [request.params.id];
+
+  client.query(SQL, value)
+    .then( (results) => {
+      let details = new PokemonDetails(results.rows[0])
+      getDamageMods(details.typeOne, details.typeTwo)
+        .then( (modResults) => {
+          modResults.forEach( (val, idx) => {
+            if( val > 1 ) {
+              details.weak.push(getTypeName(idx));
+            }
+            if( val < 1 ) {
+              details.strong.push(getTypeName(idx));
+            }
+          })
+
+          getFlavorText(details.id)
+            .then( (flavorResults) => {
+              let url = `https://pokeapi.co/api/v2/pokemon/${details.id}`;
+              details.description = flavorResults.split('\n').join(' ')
+
+              superagent.get(url)
+                .then(apiResponse => {
+                  apiResponse.body.moves.forEach( (move) => {
+                    let moveArr = [];
+                    if(move.version_group_details[0].level_learned_at >= 1) {
+                      moveArr.push(move.version_group_details[0].level_learned_at);
+                      moveArr.push(move.move.name);
+                      details.moves.push(moveArr);
+                    }
+                  })
+                  details.moves.sort( (a, b) => a[0] - b[0])
+                  response.render(`pages/detail`, {pokemon: details} )
+                    .catch(err => handleError(err, response))
+                })
+            })
+        })
+    })
+}
 
 function buildPokemonDatabase(id) {
 
@@ -148,8 +207,8 @@ function searchBy(request, response) {
     .then(result => {
       response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
       )
-      // .catch(error => handleError(error, response));
-    })
+        .catch(error => handleError(error, response));
+    }) 
 }
 
 function buildTypeDamageMods(i) {
@@ -205,7 +264,7 @@ function getDamageModifierFrom(baseType, targetType) {
   // If targetType is specified, give specific result
   if (targetType) {
     let SQL = `SELECT type_damage_from, type_damage_from_multipler WHERE type_id=${baseType} AND type_damage_to=${targetType}`
-    client.query(SQL)
+    return client.query(SQL)
       .then((result) => {
         return result.rows[0];
       })
@@ -213,9 +272,35 @@ function getDamageModifierFrom(baseType, targetType) {
 
   // if targetType is not specified, return an array of all reults
   let SQL = `SELECT type_damage_from, type_damage_from_multipler WHERE type_id=${baseType}`
-  client.query(SQL)
+  return client.query(SQL)
     .then((results) => {
       return results.rows;
+    })
+}
+
+function getDamageMods(typeOne, typeTwo) {
+  let typeList = ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'];
+  let typeOneIndex = typeList.indexOf(typeOne);
+  let typeTwoIndex = typeList.indexOf(typeTwo);
+
+  let output = new Array(19).fill(1);
+
+  let typeOneModList = [];
+  let typeTwoModList = [];
+  return client.query(`SELECT type_damage_from_multiplier FROM types_damage_from WHERE type_id=${typeOneIndex};`)
+    .then((typeOneResult) => {
+      typeOneModList = typeOneResult.rows.map((row) => {return row.type_damage_from_multiplier});
+      return client.query(`SELECT type_damage_from_multiplier FROM types_damage_from WHERE type_id=${typeTwoIndex};`)
+        .then((typeTwoResult) => {
+          typeTwoModList = typeTwoResult.rows.map((row) => {return row.type_damage_from_multiplier});
+
+          output = output.map((element, index) => {
+            return element * typeOneModList[index - 1] * typeTwoModList[index - 1]
+          })
+          output[0] = 1;
+          // console.log('281', output);
+          return output;
+        })
     })
 }
 
@@ -300,44 +385,64 @@ function getMoveData(id) {
     })
 }
 
+function addFavorite(request, response) {
+  let SQL = `INSERT INTO favorites (id) VALUES ($1);`;
+  let values = [request.params.id];
+
+  client.query(SQL, values)
+    .then(result => response.send(result))
+}
+
+function deleteFavorite(request, response) {
+  let SQL = `DELETE FROM favorites WHERE id=$1;`;
+  let values = [request.params.id];
+
+  client.query(SQL, values)
+    .then(result => response.send(result))
+}
+
 function handleError(error, response) {
   response.render('pages/error', { error: error });
 }
 
-function onePoke(request, response) {
-  response.render('./pages/pokemon-detail');
-  app.use(express.static('./public'));
-}
+// function onePoke(request, response) {
+//   response.render('./pages/pokemon-detail');
+//   app.use(express.static('./public'));
+// }
+
 // Initial database build, should be called iff database is 100% empty
-
-client.query(`SELECT * FROM types`)
-  .then((result) => {
-    if (result.rows.length === 0) {
-      buildTypeList();
-    }
-  })
-
-client.query(`SELECT * FROM species`)
-  .then((result) => {
-    if (result.rows.length === 0)
-      for (let i = 1; i < 808; i++) {
-        setTimeout(buildPokemonDatabase, i * 2000, i);
-        console.log(`Added #${i}`);
+function buildIfEmpty() {
+  client.query(`SELECT * FROM types`)
+    .then((result) => {
+      if (result.rows.length === 0) {
+        buildTypeList();
       }
-  })
+    })
 
-client.query(`SELECT * FROM types_damage_to`)
-  .then((result) => {
-    if (result.rows.length === 0) {
-      for (let i = 1; i < 19; i++) {
-        setTimeout(buildTypeDamageMods, i * 1000, i);
+  client.query(`SELECT * FROM species`)
+    .then((result) => {
+      if (result.rows.length === 0)
+        for (let i = 1; i < 808; i++) {
+          setTimeout(buildPokemonDatabase, i * 2000, i);
+          console.log(`Added #${i}`);
+        }
+    })
+
+  client.query(`SELECT * FROM types_damage_to`)
+    .then((result) => {
+      if (result.rows.length === 0) {
+        for (let i = 1; i < 19; i++) {
+          setTimeout(buildTypeDamageMods, i * 1000, i);
+        }
       }
-    }
-  })
+    })
 
-client.query(`SELECT * FROM target_type`)
-  .then((result) => {
-    if (result.rows.length === 0) {
-      buildTargetTypes();
-    }
-  })
+  client.query(`SELECT * FROM target_type`)
+    .then((result) => {
+      if (result.rows.length === 0) {
+        buildTargetTypes();
+      }
+    })
+}
+
+buildIfEmpty();
