@@ -35,9 +35,9 @@ app.get('/search', showSearch );
 app.get('/details/:id', displayDetails );
 // app.get('/detail', onePoke);
 
-app.post('/add', addFavorite);
+app.post('/add/:id', addFavorite);
 
-app.post('/delete', deleteFavorite);
+app.delete('/delete/:id', deleteFavorite);
 
 app.get('*', (request, response) => response.status(404).send('This route does not exist'));
 
@@ -78,7 +78,7 @@ function PokemonDetails(pokemon) {
 //********************
 
 function displayDetails(request, response) {
-  let SQL = `SELECT * FROM species WHERE id=$1`
+  let SQL = `SELECT * FROM species WHERE national_dex_id=$1`
   let value = [request.params.id];
 
   client.query(SQL, value)
@@ -95,8 +95,8 @@ function displayDetails(request, response) {
             }
           })
 
-          getFlavorText(detail.id)
-            .then( (flavorResults))
+          getFlavorText(details.id)
+            .then( (flavorResults) => {
               let url = `https://pokeapi.co/api/v2/pokemon/${details.id}`;
               details.description = flavorResults.split('\n').join(' ')
 
@@ -106,16 +106,17 @@ function displayDetails(request, response) {
                     let moveArr = [];
                     if(move.version_group_details[0].level_learned_at >= 1) {
                       moveArr.push(move.version_group_details[0].level_learned_at);
-                      moveArr.push(move.name);
+                      moveArr.push(move.move.name);
                       details.moves.push(moveArr);
                     }
+                  })
+                  details.moves.sort( (a, b) => a[0] - b[0])
+                  response.render(`pages/detail`, {pokemon: details} )
+                    .catch(err => handleError(err, response))
                 })
-                
-                response.render(`pages/detail/${value}`, {details: pokemon} )
-                .catch(err => handleError(err, response))
-              })
+            })
         })
-  })
+    })
 }
 
 function buildPokemonDatabase(id) {
@@ -187,9 +188,9 @@ function showSearch(request, response) {
 
 
       response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
-    )
-    .catch(error => handleError(error, response));
-  }) 
+      )
+        .catch(error => handleError(error, response));
+    }) 
 }
 
 function buildTypeDamageMods(i) {
@@ -268,16 +269,18 @@ function getDamageMods(typeOne, typeTwo) {
 
   let typeOneModList = [];
   let typeTwoModList = [];
-  client.query(`SELECT type_damage_from_multiplier FROM types_damage_from WHERE type+id=${typeOneIndex};`)
+  return client.query(`SELECT type_damage_from_multiplier FROM types_damage_from WHERE type_id=${typeOneIndex};`)
     .then((typeOneResult) => {
       typeOneModList = typeOneResult.rows.map((row) => {return row.type_damage_from_multiplier});
-      client.query(`SELECT type_damage_from_multiplier FROM types_damage_from WHERE type+id=${typeTwoIndex};`)
+      return client.query(`SELECT type_damage_from_multiplier FROM types_damage_from WHERE type_id=${typeTwoIndex};`)
         .then((typeTwoResult) => {
-          typeTwoResult = typeTwoResult.rows.map((row) => {return row.type_damage_from_multiplier});
+          typeTwoModList = typeTwoResult.rows.map((row) => {return row.type_damage_from_multiplier});
 
           output = output.map((element, index) => {
-            {return element * typeOneResult[index] * typeTwoResult[index]};
+            return element * typeOneModList[index - 1] * typeTwoModList[index - 1]
           })
+          output[0] = 1;
+          // console.log('281', output);
           return output;
         })
     })
@@ -366,15 +369,15 @@ function getMoveData(id) {
 
 function addFavorite(request, response) {
   let SQL = `INSERT INTO favorites (id) VALUES ($1);`;
-  let values = [request.query.data];
+  let values = [request.params.id];
 
   client.query(SQL, values)
     .then(result => response.send(result))
 }
 
 function deleteFavorite(request, response) {
-  let SQL = `DELETE FROM favorites WHERE ($1);`;
-  let values = [request.query.data];
+  let SQL = `DELETE FROM favorites WHERE id=$1;`;
+  let values = [request.params.id];
 
   client.query(SQL, values)
     .then(result => response.send(result))
@@ -390,7 +393,7 @@ function handleError(error, response) {
 // }
 
 // Initial database build, should be called iff database is 100% empty
-function buildIfEmpty {
+function buildIfEmpty() {
   client.query(`SELECT * FROM types`)
     .then((result) => {
       if (result.rows.length === 0) {

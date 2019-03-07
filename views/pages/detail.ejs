@@ -5,7 +5,7 @@
     <link rel="stylesheet" type="text/css" href="/style/modules/favorite-button.css" />
   </head>
   <body>
-  <%- include('../partials/favorite-button') %>
+  <%- include('../partials/favorite-button', {pokemon: pokemon}) %>
   <%- include('../partials/header') %>
   <div class="wrapper">
     <div class="poke-box">
@@ -19,15 +19,15 @@
       </ul>
       <div class="type-box">
         <ul>
-          <li> <%= pokemon.typeOne %></li>
-          <li> <%= pokemon.typeTwo %></li>
+          <li class="<%= pokemon.typeOne %>"> <%= pokemon.typeOne %> </li>
+          <li class="<%= pokemon.typeTwo %>"> <%= pokemon.typeTwo %> </li>
         </ul>
       </div>
     </div>
     <div class="strength-box">
       <ul>
         <li>Strong against: </li>
-        <%= pokemon.strong.forEach(strong => { %>
+        <% pokemon.strong.forEach( (strong) => { %>
         <li class="<%= strong %>"><%= strong %></li>
         <% }) %>
       </ul>
@@ -35,7 +35,7 @@
     <div class="weakness-box">
       <ul>
         <li>Weak against: </li>
-        <%= pokemon.weak.forEach( weak => { %>
+        <% pokemon.weak.forEach( (weak) => { %>
         <li class="<%= weak %>"><%= weak %></li>
         <% }) %>
       </ul>
@@ -47,10 +47,10 @@
           <th>Level Learned</th>
           <th>Name</th>
         </tr>
-        <%= pokemon.moves.forEach( move => { %>
+        <% pokemon.moves.forEach( (move) => { %>
         <tr>
-          <td><%= move.level %></td>
-          <td><%= move.name %></td>
+          <td><%= move[0] %></td>
+          <td><%= move[1] %></td>
         </tr>
         <% }) %>
       </table>
