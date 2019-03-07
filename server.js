@@ -100,6 +100,7 @@ function displayDetails(request, response) {
     .then( (results) => {
       let details = new PokemonDetails(results.rows[0])
 
+<<<<<<< HEAD
       client.query(`SELECT * FROM favorites;`)
         .then((favorites) => {
           console.log('faves', favorites.rows);
@@ -136,6 +137,26 @@ function displayDetails(request, response) {
                       response.render(`pages/detail`, {pokemon: details} )
                     })
                     .catch(err => handleError(err, response))
+=======
+          getFlavorText(details.id)
+            .then( (flavorResults) => {
+              let url = `https://pokeapi.co/api/v2/pokemon/${details.id}`;
+              details.description = flavorResults.split('\n').join(' ')
+
+              superagent.get(url)
+                .then(apiResponse => {
+                  apiResponse.body.moves.forEach( (move) => {
+                    let moveArr = [];
+                    if(move.version_group_details[0].level_learned_at >= 1) {
+                      moveArr.push(move.version_group_details[0].level_learned_at);
+                      moveArr.push(move.move.name);
+                      details.moves.push(moveArr);
+                    }
+                  })
+                  details.moves.sort( (a, b) => a[0] - b[0])
+                  response.render(`pages/detail`, {pokemon: details} )
+                  // .catch(err => handleError(err, response))
+>>>>>>> ad5205e86bebdd49c882e844cee057d7c20ccb72
                 })
             })
         })
@@ -209,8 +230,6 @@ function changedArrayToPrepareForEJSRender (arr) {
     // console.log(whole);
   })
 }
-
-
 
 function showSearch(request, response) {
   // console.log(request.body.pages);
