@@ -411,9 +411,12 @@ function handleError(error, response) {
 //   app.use(express.static('./public'));
 // }
 
-// Initial database build, should be called iff database is 100% empty
+// Initial database build, each part should be called iff database is 100% empty
 function buildIfEmpty() {
+  // used to set calls back to back, instead of all at once
   let delay = 0;
+
+  // If types arn't populated, build them - needed for foreign keys
   client.query(`SELECT * FROM types`)
     .then((result) => {
       if (result.rows.length === 1) {
@@ -423,6 +426,7 @@ function buildIfEmpty() {
       }
     })
 
+  // Species list is needed for searching
   client.query(`SELECT * FROM species`)
     .then((result) => {
       if (result.rows.length === 0) {
@@ -435,6 +439,7 @@ function buildIfEmpty() {
       }
     })
 
+  // Type damag relations are needed for strength/weakness charts
   client.query(`SELECT * FROM types_damage_to`)
     .then((result) => {
       if (result.rows.length === 0) {
@@ -442,11 +447,13 @@ function buildIfEmpty() {
           setTimeout(buildTypeDamageMods, (i + delay) * 1000, i);
         }
         console.log('Weaknesses list is empty, building...');
-        delay += 20;
+        delay += 40;
       }
 
     })
+
   // always a single call, it can slot in wherever
+  // Displays what a move can target, foreign key for moves
   client.query(`SELECT * FROM target_type`)
     .then((result) => {
       if (result.rows.length === 0) {
@@ -454,6 +461,8 @@ function buildIfEmpty() {
         console.log('Move targetting types list is empty, building...');
       }
     })
+
+  // Will be needed as foreign key for movelist with details
   client.query('SELECT * FROM moves')
     .then((result) => {
       if (result.rows.length === 0) {
