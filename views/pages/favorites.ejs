@@ -2,14 +2,13 @@
 <html>
 
 <head>
-  <title>PokéSearch</title>
+  <title>Favorite Pokémon</title>
   <%- include('../partials/head') %>
 </head>
 
 <body>
   <%- include('./../partials/header') %>
   <main class="cards">
-    <%- include('../partials/search-form') %>
     <% result.forEach(pokemon => { %>
       <%- include('../partials/row', {pokemon: pokemon}) %>
     <% }); %>

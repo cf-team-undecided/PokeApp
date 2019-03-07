@@ -5,18 +5,20 @@
 </head>
 <body>
   <%- include('./partials/header') %>
-  <main>
-    <a href="/detail">
-      <p>Test detail view page</p>
-    </a>
+  <main class="cards">
+    <section class="row">
     <a href="/search">
-      <img class="homepage" src="/images/search.png" />
+      <img class="row-article" src="/images/search.png" />
     </a>
+    </section>
+    <section class="row">
     <a href="/favorites">
-      <img class="homepage" src="/images/faves.png" />
+      <img class="row-article" src="/images/faves.png" />
     </a>
-    <a href="/teams">
+    </section>
+    <!-- Saved Teams -->
+    <!-- <a href="/teams">
       <img class="homepage" src="/images/teams.png" />
-    </a>
+    </a> -->
   </main>
 </body>
