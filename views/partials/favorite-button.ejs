@@ -1,10 +1,10 @@
 <div>
-  <h6 id="favorite-text" class="invisible">Favorite!</h6>
-  <form class="toggle" id="add-favorite" >
+  <h6 id="favorite-text" class="<%= (!pokemon.favoritesArr.includes(pokemon.id) ? 'invisible' : '') %>">Favorite!</h6>
+  <form class="<%= (pokemon.favoritesArr.includes(pokemon.id) ? 'hidden toggle' : 'toggle') %>" id="add-favorite" >
     <input type="hidden" name="id" id="add" value="<%= pokemon.id %>" />
     <button class="star" type="submit"><span>&#9734</span></button>
   </form>
-  <form class="hidden toggle" id="delete-favorite" >
+  <form class="<%= (!pokemon.favoritesArr.includes(pokemon.id) ? 'hidden toggle' : 'toggle') %>" id="delete-favorite" >
     <input type="hidden" name="id" id="delete" value="<%= pokemon.id %>" />
     <button class="star" type="submit"><span>&#9733</span></button>
   </form>

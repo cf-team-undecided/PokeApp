@@ -84,7 +84,7 @@ function PokemonDetails(pokemon) {
   this.weak = [];
   this.description = '';
   this.moves = [];
-  this.favorite = false;
+  this.favoritesArr = [];
 
 }
 
@@ -96,43 +96,47 @@ function displayDetails(request, response) {
   let SQL = `SELECT * FROM species WHERE national_dex_id=$1`
   let value = [request.params.id];
 
-  client.query(SQL, value)
+  return client.query(SQL, value)
     .then( (results) => {
       let details = new PokemonDetails(results.rows[0])
-      getDamageMods(details.typeOne, details.typeTwo)
-        .then( (modResults) => {
-          modResults.forEach( (val, idx) => {
-            if( val > 1 ) {
-              details.weak.push(getTypeName(idx));
-            }
-            if( val < 1 ) {
-              details.strong.push(getTypeName(idx));
-            }
-          })
 
-          getFlavorText(details.id)
-            .then( (flavorResults) => {
-              let url = `https://pokeapi.co/api/v2/pokemon/${details.id}`;
-              details.description = flavorResults.split('\n').join(' ')
+      client.query(`SELECT * FROM favorites;`)
+        .then((favorites) => {
+          console.log('faves', favorites.rows);
+          favorites.rows.forEach( (faves) => details.favoritesArr.push(faves.id));
 
-              superagent.get(url)
-                .then(apiResponse => {
-                  apiResponse.body.moves.forEach( (move) => {
-                    let moveArr = [];
-                    if(move.version_group_details[0].level_learned_at >= 1) {
-                      moveArr.push(move.version_group_details[0].level_learned_at);
-                      moveArr.push(move.move.name);
-                      details.moves.push(moveArr);
-                    }
-                  })
-                  details.moves.sort( (a, b) => a[0] - b[0])
-                    .then( isFavorite => {
-                      SQL = `SELECT * FROM favorites;`;
-                      let favoritesArr = client.query(SQL)
+          getDamageMods(details.typeOne, details.typeTwo)
+            .then( (modResults) => {
+              modResults.forEach( (val, idx) => {
+                if( val > 1 ) {
+                  details.weak.push(getTypeName(idx));
+                }
+                if( val < 1 ) {
+                  details.strong.push(getTypeName(idx));
+                }
+              })
+
+              getFlavorText(details.id)
+                .then( (flavorResults) => {
+                  let url = `https://pokeapi.co/api/v2/pokemon/${details.id}`;
+                  details.description = flavorResults.split('\n').join(' ')
+
+                  superagent.get(url)
+                    .then(apiResponse => {
+                      apiResponse.body.moves.forEach( (move) => {
+                        let moveArr = [];
+                        if(move.version_group_details[0].level_learned_at >= 1) {
+                          moveArr.push(move.version_group_details[0].level_learned_at);
+                          moveArr.push(move.move.name);
+                          details.moves.push(moveArr);
+                        }
+                      })
+                      details.moves.sort( (a, b) => a[0] - b[0])
+                      console.log('object', details);
                       response.render(`pages/detail`, {pokemon: details} )
                     })
+                    .catch(err => handleError(err, response))
                 })
-                .catch(err => handleError(err, response))
             })
         })
     })
