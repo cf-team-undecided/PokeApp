@@ -85,36 +85,36 @@ function displayDetails(request, response) {
   let value = [request.params.id];
 
   client.query(SQL, value)
-    .then( (results) => {
+    .then((results) => {
       let details = new PokemonDetails(results.rows[0])
       getDamageMods(details.typeOne, details.typeTwo)
-        .then( (modResults) => {
-          modResults.forEach( (val, idx) => {
-            if( val > 1 ) {
+        .then((modResults) => {
+          modResults.forEach((val, idx) => {
+            if (val > 1) {
               details.weak.push(getTypeName(idx));
             }
-            if( val < 1 ) {
+            if (val < 1) {
               details.strong.push(getTypeName(idx));
             }
           })
 
           getFlavorText(details.id)
-            .then( (flavorResults) => {
+            .then((flavorResults) => {
               let url = `https://pokeapi.co/api/v2/pokemon/${details.id}`;
               details.description = flavorResults.split('\n').join(' ')
 
               superagent.get(url)
                 .then(apiResponse => {
-                  apiResponse.body.moves.forEach( (move) => {
+                  apiResponse.body.moves.forEach((move) => {
                     let moveArr = [];
-                    if(move.version_group_details[0].level_learned_at >= 1) {
+                    if (move.version_group_details[0].level_learned_at >= 1) {
                       moveArr.push(move.version_group_details[0].level_learned_at);
                       moveArr.push(move.move.name);
                       details.moves.push(moveArr);
                     }
                   })
-                  details.moves.sort( (a, b) => a[0] - b[0])
-                  response.render(`pages/detail`, {pokemon: details} )
+                  details.moves.sort((a, b) => a[0] - b[0])
+                  response.render(`pages/detail`, { pokemon: details })
                     .catch(err => handleError(err, response))
                 })
             })
@@ -139,7 +139,7 @@ function buildPokemonDatabase(id) {
           // console.log(values);
           client.query(SQL, values)
             .then(() => {
-              console.log(`#${id} complete`);
+              console.log(`Pokemon #${id}, ${result.body.species.name} complete`);
             });
         })
 
@@ -150,7 +150,7 @@ function buildPokemonDatabase(id) {
 function buildTypeList() {
   let url = 'https://pokeapi.co/api/v2/type/';
 
-  superagent.get(url)
+  return superagent.get(url)
     .then((result) => {
       // console.log(result);
       result.body.results.forEach((type) => {
@@ -158,7 +158,7 @@ function buildTypeList() {
         let SQL = 'INSERT INTO types (api_id, name) VALUES($1, $2);'
         let values = ([type.url.split('/')[6], type.name]);
 
-        client.query(SQL, values)
+        return client.query(SQL, values)
           .then(() => { return });
       })
     })
@@ -173,8 +173,8 @@ function getPokemonData(id) {
     })
 }
 
-function changedArrayToPrepareForEJSRender (arr) {
-  return arr.map(type =>{
+function changedArrayToPrepareForEJSRender(arr) {
+  return arr.map(type => {
     let whole = type;
 
     // whole.type_primary_id =  getTypeName(type.type_primary_id);
@@ -187,13 +187,13 @@ function changedArrayToPrepareForEJSRender (arr) {
 function showSearch(request, response) {
   console.log(request.body.pages);
   let SQL = 'SELECT * FROM species ';
-  if (request.body.pages === undefined){SQL += 'LIMIT 20'}
-  if (request.body.pages){ SQL += `ORDER BY national_dex_id OFFSET ${parseInt(request.body.pages)* 20} FETCH NEXT 20 ROWS ONLY`}
+  if (request.body.pages === undefined) { SQL += 'LIMIT 20' }
+  if (request.body.pages) { SQL += `ORDER BY national_dex_id OFFSET ${parseInt(request.body.pages) * 20} FETCH NEXT 20 ROWS ONLY` }
   console.log(SQL);
 
   return client.query(SQL)
     .then(result => {
-      response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
+      response.render('./pages/search', { result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'] }
       )
       // .catch(error => handleError(error, response));
     });
@@ -202,14 +202,14 @@ function showSearch(request, response) {
 function searchBy(request, response) {
   let SQL = 'SELECT * FROM species WHERE ';
   console.log('135', request.body.search);
-  if(request.body.search) {SQL += `name='${request.body.search}'`}
-  if(request.body.search === '') {SQL += `type_primary_id='${parseInt(request.body.types)}'`}
+  if (request.body.search) { SQL += `name='${request.body.search}'` }
+  if (request.body.search === '') { SQL += `type_primary_id='${parseInt(request.body.types)}'` }
   return client.query(SQL)
     .then(result => {
-      response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
+      response.render('./pages/search', { result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'] }
       )
         .catch(error => handleError(error, response));
-    }) 
+    })
 }
 
 function buildTypeDamageMods(i) {
@@ -290,10 +290,10 @@ function getDamageMods(typeOne, typeTwo) {
   let typeTwoModList = [];
   return client.query(`SELECT type_damage_from_multiplier FROM types_damage_from WHERE type_id=${typeOneIndex};`)
     .then((typeOneResult) => {
-      typeOneModList = typeOneResult.rows.map((row) => {return row.type_damage_from_multiplier});
+      typeOneModList = typeOneResult.rows.map((row) => { return row.type_damage_from_multiplier });
       return client.query(`SELECT type_damage_from_multiplier FROM types_damage_from WHERE type_id=${typeTwoIndex};`)
         .then((typeTwoResult) => {
-          typeTwoModList = typeTwoResult.rows.map((row) => {return row.type_damage_from_multiplier});
+          typeTwoModList = typeTwoResult.rows.map((row) => { return row.type_damage_from_multiplier });
 
           output = output.map((element, index) => {
             return element * typeOneModList[index - 1] * typeTwoModList[index - 1]
@@ -413,35 +413,54 @@ function handleError(error, response) {
 
 // Initial database build, should be called iff database is 100% empty
 function buildIfEmpty() {
+  let delay = 0;
   client.query(`SELECT * FROM types`)
     .then((result) => {
-      if (result.rows.length === 0) {
+      if (result.rows.length === 1) {
+        console.log('Types list is empty, building...')
         buildTypeList();
+        delay += 2;
       }
     })
 
   client.query(`SELECT * FROM species`)
     .then((result) => {
-      if (result.rows.length === 0)
+      if (result.rows.length === 0) {
         for (let i = 1; i < 808; i++) {
-          setTimeout(buildPokemonDatabase, i * 2000, i);
-          console.log(`Added #${i}`);
+          setTimeout(buildPokemonDatabase, (i + delay) * 2000, i);
+
         }
+        console.log('Pokemon list is empty, building...')
+        delay += 1614;
+      }
     })
 
   client.query(`SELECT * FROM types_damage_to`)
     .then((result) => {
       if (result.rows.length === 0) {
         for (let i = 1; i < 19; i++) {
-          setTimeout(buildTypeDamageMods, i * 1000, i);
+          setTimeout(buildTypeDamageMods, (i + delay) * 1000, i);
         }
+        console.log('Weaknesses list is empty, building...');
+        delay += 20;
       }
-    })
 
+    })
+  // always a single call, it can slot in wherever
   client.query(`SELECT * FROM target_type`)
     .then((result) => {
       if (result.rows.length === 0) {
         buildTargetTypes();
+        console.log('Move targetting types list is empty, building...');
+      }
+    })
+  client.query('SELECT * FROM moves')
+    .then((result) => {
+      if (result.rows.length === 0) {
+        for (let i = 1; i < 728; i++) {
+          setTimeout(getMoveData, (i + delay) * 1000, i);
+        }
+        console.log('Moves list is empty, building...');
       }
     })
 }
