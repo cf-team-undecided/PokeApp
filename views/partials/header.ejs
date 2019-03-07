@@ -1,12 +1,36 @@
 <header>
-  <nav class="navigation">
-    <ul>
-      <li><a href="/">Home</a></li>
-      <li><a href="#">Random Pokemon</a></li>
-      <li><a href="#">Drop down pokeball</a></li>
-      <li><a href="/detail">One pokemon detail view</a></li>
-    </ul>
-    <a href="http://pokemondb.net/pokedex/pikachu"><img src="https://img.pokemondb.net/sprites/black-white/normal/pikachu-f.png" alt="Pikachu"></a>
-    <!-- Drop Down Menu -->
+<!--    Made by Erik Terwan    -->
+<!--   24th of November 2015   -->
+<!--        MIT License        -->
+<nav role="navigation">
+    <div id="menuToggle">
+      <!--
+      A fake / hidden checkbox is used as click reciever,
+      so you can use the :checked selector on it.
+      -->
+      <input type="checkbox" />
+      
+      <!--
+      Some spans to act as a hamburger.
+      
+      They are acting like a real hamburger,
+      not that McDonalds stuff.
+      -->
+      <span></span>
+      <span></span>
+      <span></span>
+      
+      <!--
+      Too bad the menu has to be inside of the button
+      but hey, it's pure CSS magic.
+      -->
+      <ul id="menu">
+        <a href="#"><li>Home</li></a>
+        <a href="#"><li>About</li></a>
+        <a href="#"><li>Info</li></a>
+        <a href="#"><li>Contact</li></a>
+        <a href="https://erikterwan.com/" target="_blank"><li>Show me more</li></a>
+      </ul>
+    </div>
   </nav>
 </header>
