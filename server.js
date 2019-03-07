@@ -184,8 +184,8 @@ function changedArrayToPrepareForEJSRender (arr) {
 
 function showSearch(request, response) {
   let SQL = 'SELECT * FROM species ';
-  if (request.body.pages === undefined){SQL += 'LIMIT 20'}
-  if (request.body.pages){ SQL += `ORDER BY national_dex_id OFFSET ${parseInt(request.body.pages)* 20} FETCH NEXT 20 ROWS ONLY`}
+  if (request.body.pages === undefined){SQL += 'LIMIT 50'}
+  if (request.body.pages){ SQL += `ORDER BY national_dex_id OFFSET ${parseInt(request.body.pages)* 50} FETCH NEXT 50 ROWS ONLY`}
 
   return client.query(SQL)
     .then(result => {

@@ -8,19 +8,21 @@
 
 <body>
   <%- include('./../partials/header') %>
+  <div id="forms">
+  <%- include('../partials/search-form') %>
+  <%- include('../partials/page-numbers') %>
+  </div>
   <main class="cards">
-    <%- include('../partials/search-form') %>
     <% result.forEach(pokemon => { %>
     <a href="/details/<%= pokemon.national_dex_id %>">
       <section class="row">
         <h2 class="pokemon-title"> <%=pokemon.name %></h2>
         <img src="<%= pokemon.image_url %>" alt="<%= pokemon.name %>">
-        <span><%= types[pokemon.type_primary_id] %></span>
+        <span>Type: <%= types[pokemon.type_primary_id] %></span>
       </section>
     </a>
     <% }); %>
   </main>
-  <%- include('../partials/page-numbers') %>
 </body>
 
 </html>

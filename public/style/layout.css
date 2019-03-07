@@ -82,10 +82,17 @@
   margin: 0 auto 30px;
 }
 
-
 .row {
   position: relative;
   border: 1px solid black;
+}
+
+.row h2 {
+  position: absolute;
+  left: 50%;
+  top: 10%;
+  width: 100%;
+  padding: 10px;
 }
 
 .row-article {
@@ -94,10 +101,47 @@
   /* object-fit: cover; */
 }
 
-.pokemon-title {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  padding: 10px;
+.home-page {
+  max-width: 80%;
+  margin: auto;
 }
 
+/* *********************************** */
+/* Home Page CSS */
+/* *********************************** */
+
+.home-page section {
+  margin: 10%;
+}
+
+.search-button {
+  height: 200px;
+  width: 100%;
+  display: block;
+}
+
+.fav-button {
+  height: 200px;
+  width: 100%;
+  display: block;
+}
+/* *********************************** */
+/* Form CSS */
+/* *********************************** */
+
+#enter-name {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-align: center;
+  background: rgba(76, 175, 80, 0.3)
+}
+
+#forms {
+  border: 1px solid black;
+  padding: 10px;
+  background: rgba(226, 119, 115, 0.3)
+}
