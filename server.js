@@ -3,6 +3,7 @@
 // App Dependencies
 const express = require('express');
 const superagent = require('superagent');
+// const methodOverride = require('method-override');
 const pg = require('pg');
 
 // Load environment variables from .env file
@@ -26,6 +27,16 @@ app.use(express.static('./public'));
 // Set the view engine for templating
 app.set('view engine', 'ejs');
 
+// Middleware to handle DELETE
+// app.use(methodOverride((request, response) => {
+//   if (request.body && typeof request.body === 'object' && '_method' in request.body) {
+//     // look in urlencoded POST bodies and delete it
+//     let method = request.body._method;
+//     delete request.body._method;
+//     return method;
+//   }
+// }))
+
 // Routes
 
 app.get('/', (request, response) => response.render('./index'));
@@ -36,9 +47,9 @@ app.post('/search', showSearch);
 
 app.get('/details/:id', displayDetails);
 
-app.post('/add/:id', addFavorite);
+app.post('/add/', addFavorite);
 
-app.delete('/delete/:id', deleteFavorite);
+app.delete('/delete', deleteFavorite);
 
 app.post('/searchBy', searchBy);
 
@@ -73,6 +84,7 @@ function PokemonDetails(pokemon) {
   this.weak = [];
   this.description = '';
   this.moves = [];
+  this.favorite = false;
 
 }
 
@@ -114,9 +126,13 @@ function displayDetails(request, response) {
                     }
                   })
                   details.moves.sort( (a, b) => a[0] - b[0])
-                  response.render(`pages/detail`, {pokemon: details} )
-                    .catch(err => handleError(err, response))
+                    .then( isFavorite => {
+                      SQL = `SELECT * FROM favorites;`;
+                      let favoritesArr = client.query(SQL)
+                      response.render(`pages/detail`, {pokemon: details} )
+                    })
                 })
+                .catch(err => handleError(err, response))
             })
         })
     })
@@ -185,11 +201,11 @@ function changedArrayToPrepareForEJSRender (arr) {
 
 
 function showSearch(request, response) {
-  console.log(request.body.pages);
+  // console.log(request.body.pages);
   let SQL = 'SELECT * FROM species ';
   if (request.body.pages === undefined){SQL += 'LIMIT 20'}
   if (request.body.pages){ SQL += `ORDER BY national_dex_id OFFSET ${parseInt(request.body.pages)* 20} FETCH NEXT 20 ROWS ONLY`}
-  console.log(SQL);
+  // console.log(SQL);
 
   return client.query(SQL)
     .then(result => {
@@ -208,8 +224,8 @@ function searchBy(request, response) {
     .then(result => {
       response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
       )
-        .catch(error => handleError(error, response));
-    }) 
+    })
+    .catch(error => handleError(error, response));
 }
 
 function buildTypeDamageMods(i) {
@@ -387,19 +403,29 @@ function getMoveData(id) {
 }
 
 function addFavorite(request, response) {
-  let SQL = `INSERT INTO favorites (id) VALUES ($1);`;
-  let values = [request.params.id];
+  let SQL = `INSERT INTO favorites(id) VALUES($1);`;
+  let value = [request.body.data];
 
-  client.query(SQL, values)
-    .then(result => response.send(result))
+  client.query(SQL, value)
+    .then(result => {
+      result = ['invisible'];
+      response.send(result)
+    })
+    .catch(error => handleError(error, response));
+
 }
 
 function deleteFavorite(request, response) {
   let SQL = `DELETE FROM favorites WHERE id=$1;`;
-  let values = [request.params.id];
+  let values = [request.body.data];
 
   client.query(SQL, values)
-    .then(result => response.send(result))
+    .then(result => {
+      result = ['invisible'];
+      response.send(result)
+    })
+    .catch(error => handleError(error, response));
+
 }
 
 function handleError(error, response) {

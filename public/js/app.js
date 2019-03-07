@@ -7,13 +7,17 @@ $('#delete-favorite').on('submit', deleteFavorite)
 function addFavorite(event) {
   event.preventDefault();
   let add = $('#add').val();
+  console.log('success');
 
   $.ajax({
     url: '/add',
     method: 'POST',
-    data: {data: add}
+    data: {data: add},
+    success: function(result) {
+      $('#favorite-text').removeClass(result)
+      $('#favorite-text').nextAll('.toggle').toggle();
+    }
   })
-    .then();
 }
 
 function deleteFavorite(event) {
@@ -25,5 +29,9 @@ function deleteFavorite(event) {
     method: 'DELETE',
     data: {data: del}
   })
-    .then();
+    .then(val => {
+      $('#favorite-text').addClass(val)
+      $('#favorite-text').nextAll('.toggle').toggle();
+    })
+
 }
