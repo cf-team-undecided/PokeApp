@@ -2,35 +2,13 @@
  * Made by Erik Terwan
  * 24th of November 2015
  * MIT License
- *
- *
- * If you are thinking of using this in
- * production code, beware of the browser
- * prefixes.
  */
 
- body
- {
-   margin: 0;
-   padding: 0;
-   
-   /* make it look decent enough */
-   background: #232323;
-   color: #cdcdcd;
-   font-family: "Avenir Next", "Avenir", sans-serif;
- }
- 
  a
  {
    text-decoration: none;
    color: #232323;
-   
    transition: color 0.3s ease;
- }
- 
- a:hover
- {
-   color: tomato;
  }
  
  #menuToggle
@@ -63,9 +41,6 @@
    -webkit-touch-callout: none;
  }
  
- /*
-  * Just a quick hamburger
-  */
  #menuToggle span
  {
    display: block;

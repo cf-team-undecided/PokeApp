@@ -215,11 +215,9 @@ function changedArrayToPrepareForEJSRender (arr) {
 }
 
 function showSearch(request, response) {
-  // console.log(request.body.pages);
   let SQL = 'SELECT * FROM species ';
   if (request.body.pages === undefined){SQL += 'LIMIT 20'}
   if (request.body.pages){ SQL += `ORDER BY national_dex_id OFFSET ${parseInt(request.body.pages)* 20} FETCH NEXT 20 ROWS ONLY`}
-  // console.log(SQL);
 
   return client.query(SQL)
     .then(result => {
@@ -231,7 +229,6 @@ function showSearch(request, response) {
 
 function searchBy(request, response) {
   let SQL = 'SELECT * FROM species WHERE ';
-  console.log('135', request.body.search);
   if(request.body.search) {SQL += `name='${request.body.search}'`}
   if(request.body.search === '') {SQL += `type_primary_id='${parseInt(request.body.types)}'`}
   return client.query(SQL)
