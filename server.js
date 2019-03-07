@@ -51,6 +51,8 @@ app.post('/add/', addFavorite);
 
 app.delete('/delete', deleteFavorite);
 
+app.get('/favorites', showFavorites);
+
 app.post('/searchBy', searchBy);
 
 app.get('*', (request, response) => response.status(404).send('This route does not exist'));
@@ -100,10 +102,8 @@ function displayDetails(request, response) {
     .then( (results) => {
       let details = new PokemonDetails(results.rows[0])
 
-<<<<<<< HEAD
       client.query(`SELECT * FROM favorites;`)
         .then((favorites) => {
-          console.log('faves', favorites.rows);
           favorites.rows.forEach( (faves) => details.favoritesArr.push(faves.id));
 
           getDamageMods(details.typeOne, details.typeTwo)
@@ -133,34 +133,17 @@ function displayDetails(request, response) {
                         }
                       })
                       details.moves.sort( (a, b) => a[0] - b[0])
-                      console.log('object', details);
                       response.render(`pages/detail`, {pokemon: details} )
                     })
                     .catch(err => handleError(err, response))
-=======
-          getFlavorText(details.id)
-            .then( (flavorResults) => {
-              let url = `https://pokeapi.co/api/v2/pokemon/${details.id}`;
-              details.description = flavorResults.split('\n').join(' ')
-
-              superagent.get(url)
-                .then(apiResponse => {
-                  apiResponse.body.moves.forEach( (move) => {
-                    let moveArr = [];
-                    if(move.version_group_details[0].level_learned_at >= 1) {
-                      moveArr.push(move.version_group_details[0].level_learned_at);
-                      moveArr.push(move.move.name);
-                      details.moves.push(moveArr);
-                    }
-                  })
-                  details.moves.sort( (a, b) => a[0] - b[0])
-                  response.render(`pages/detail`, {pokemon: details} )
-                  // .catch(err => handleError(err, response))
->>>>>>> ad5205e86bebdd49c882e844cee057d7c20ccb72
                 })
+                .catch(err => handleError(err, response))
             })
+            .catch(err => handleError(err, response))
         })
+        .catch(err => handleError(err, response))
     })
+    .catch(err => handleError(err, response))
 }
 
 function getRandomPokemon() {
@@ -242,8 +225,8 @@ function showSearch(request, response) {
     .then(result => {
       response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
       )
-      // .catch(error => handleError(error, response));
-    });
+    })
+    .catch(err => handleError(err, response))
 }
 
 function searchBy(request, response) {
@@ -256,7 +239,28 @@ function searchBy(request, response) {
       response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
       )
     })
-    .catch(error => handleError(error, response));
+    .catch(err => handleError(err, response))
+}
+
+function showFavorites(request, response) {
+  console.log('working!');
+  client.query(`SELECT * FROM favorites;`)
+    .then((favorites) => {
+      console.log('favorites, unsort', favorites);
+      let SQL = 'SELECT * FROM species WHERE national_dex_id=$1;';
+      let values = favorites.rows.map( faves => faves.id);
+      values.sort( (a, b) => a - b);
+      console.log('sorted faves', values);
+
+      client.query(SQL, values)
+        .then(result => {
+          console.log('response', result.rows);
+          response.render('./pages/favorites', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
+          )
+        })
+        .catch(err => handleError(err, response))
+    })
+    .catch(err => handleError(err, response))
 }
 
 function buildTypeDamageMods(i) {
