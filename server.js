@@ -243,19 +243,26 @@ function searchBy(request, response) {
 }
 
 function showFavorites(request, response) {
-  console.log('working!');
-  client.query(`SELECT * FROM favorites;`)
-    .then((favorites) => {
-      console.log('favorites, unsort', favorites);
-      let SQL = 'SELECT * FROM species WHERE national_dex_id=$1;';
-      let values = favorites.rows.map( faves => faves.id);
-      values.sort( (a, b) => a - b);
-      console.log('sorted faves', values);
+  let SQL = 'SELECT * FROM species ';
+  let fullArr = [];
 
-      client.query(SQL, values)
-        .then(result => {
-          console.log('response', result.rows);
-          response.render('./pages/favorites', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
+  return client.query(SQL)
+    .then (allPokemon => {
+      fullArr = (allPokemon.rows);
+      client.query(`SELECT * FROM favorites;`)
+        .then((favorites) => {
+          let favoritesArr = [];
+          let values = favorites.rows.map( faves => faves.id).sort( (a, b) => a - b);
+
+          fullArr.forEach( (val) => {
+            values.forEach( (faveVal) => {
+              if (val.national_dex_id === faveVal) {
+                favoritesArr.push(val)
+              }
+            })
+          })
+
+          response.render('./pages/favorites', {result: favoritesArr, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
           )
         })
         .catch(err => handleError(err, response))
