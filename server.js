@@ -517,4 +517,4 @@ function getMoveList(id) {
     })
 }
 
-buildIfEmpty();
+// buildIfEmpty();
