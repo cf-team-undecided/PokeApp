@@ -3,6 +3,7 @@
 // App Dependencies
 const express = require('express');
 const superagent = require('superagent');
+// const methodOverride = require('method-override');
 const pg = require('pg');
 
 // Load environment variables from .env file
@@ -26,6 +27,16 @@ app.use(express.static('./public'));
 // Set the view engine for templating
 app.set('view engine', 'ejs');
 
+// Middleware to handle DELETE
+// app.use(methodOverride((request, response) => {
+//   if (request.body && typeof request.body === 'object' && '_method' in request.body) {
+//     // look in urlencoded POST bodies and delete it
+//     let method = request.body._method;
+//     delete request.body._method;
+//     return method;
+//   }
+// }))
+
 // Routes
 
 app.get('/', (request, response) => response.render('./index'));
@@ -36,9 +47,11 @@ app.post('/search', showSearch);
 
 app.get('/details/:id', displayDetails);
 
-app.post('/add/:id', addFavorite);
+app.post('/add/', addFavorite);
 
-app.delete('/delete/:id', deleteFavorite);
+app.delete('/delete', deleteFavorite);
+
+app.get('/favorites', showFavorites);
 
 app.post('/searchBy', searchBy);
 
@@ -73,6 +86,7 @@ function PokemonDetails(pokemon) {
   this.weak = [];
   this.description = '';
   this.moves = [];
+  this.favoritesArr = [];
 
 }
 
@@ -84,42 +98,62 @@ function displayDetails(request, response) {
   let SQL = `SELECT * FROM species WHERE national_dex_id=$1`
   let value = [request.params.id];
 
-  client.query(SQL, value)
+
+
+  return client.query(SQL, value)
     .then( (results) => {
       let details = new PokemonDetails(results.rows[0])
-      getDamageMods(details.typeOne, details.typeTwo)
-        .then( (modResults) => {
-          modResults.forEach( (val, idx) => {
-            if( val > 1 ) {
-              details.weak.push(getTypeName(idx));
-            }
-            if( val < 1 ) {
-              details.strong.push(getTypeName(idx));
-            }
-          })
 
-          getFlavorText(details.id)
-            .then( (flavorResults) => {
-              let url = `https://pokeapi.co/api/v2/pokemon/${details.id}`;
-              details.description = flavorResults.split('\n').join(' ')
+      client.query(`SELECT * FROM favorites;`)
+        .then((favorites) => {
+          favorites.rows.forEach( (faves) => details.favoritesArr.push(faves.id));
 
-              superagent.get(url)
-                .then(apiResponse => {
-                  apiResponse.body.moves.forEach( (move) => {
-                    let moveArr = [];
-                    if(move.version_group_details[0].level_learned_at >= 1) {
-                      moveArr.push(move.version_group_details[0].level_learned_at);
-                      moveArr.push(move.move.name);
-                      details.moves.push(moveArr);
-                    }
-                  })
-                  details.moves.sort( (a, b) => a[0] - b[0])
-                  response.render(`pages/detail`, {pokemon: details} )
-                  // .catch(err => handleError(err, response))
+          getDamageMods(details.typeOne, details.typeTwo)
+            .then( (modResults) => {
+              modResults.forEach( (val, idx) => {
+                if( val > 1 ) {
+                  details.weak.push(getTypeName(idx));
+                }
+                if( val < 1 ) {
+                  details.strong.push(getTypeName(idx));
+                }
+              })
+
+              getFlavorText(details.id)
+                .then( (flavorResults) => {
+                  let url = `https://pokeapi.co/api/v2/pokemon/${details.id}`;
+                  details.description = flavorResults.split('\n').join(' ')
+
+                  superagent.get(url)
+                    .then(apiResponse => {
+                      apiResponse.body.moves.forEach( (move) => {
+                        let moveArr = [];
+                        if(move.version_group_details[0].level_learned_at >= 1) {
+                          moveArr.push(move.version_group_details[0].level_learned_at);
+                          moveArr.push(move.move.name);
+                          details.moves.push(moveArr);
+                        }
+                      })
+                      details.moves.sort( (a, b) => a[0] - b[0])
+                      response.render(`pages/detail`, {pokemon: details} )
+                    })
+                    .catch(err => handleError(err, response))
                 })
+                .catch(err => handleError(err, response))
             })
+            .catch(err => handleError(err, response))
         })
+        .catch(err => handleError(err, response))
     })
+    .catch(err => handleError(err, response))
+}
+
+function getRandomPokemon() {
+  let SQL = `SELECT * FROM species WHERE id=$1;`;
+  let randomPokemon = Math.ceil(Math.random() * Math.ceil(807));
+  let value = [randomPokemon];
+
+  return client.query(SQL, value);
 }
 
 function buildPokemonDatabase(id) {
@@ -139,7 +173,7 @@ function buildPokemonDatabase(id) {
           // console.log(values);
           client.query(SQL, values)
             .then(() => {
-              console.log(`#${id} complete`);
+              console.log(`Pokemon #${id}, ${result.body.species.name} complete`);
             });
         })
 
@@ -150,7 +184,7 @@ function buildPokemonDatabase(id) {
 function buildTypeList() {
   let url = 'https://pokeapi.co/api/v2/type/';
 
-  superagent.get(url)
+  return superagent.get(url)
     .then((result) => {
       // console.log(result);
       result.body.results.forEach((type) => {
@@ -158,7 +192,7 @@ function buildTypeList() {
         let SQL = 'INSERT INTO types (api_id, name) VALUES($1, $2);'
         let values = ([type.url.split('/')[6], type.name]);
 
-        client.query(SQL, values)
+        return client.query(SQL, values)
           .then(() => { return });
       })
     })
@@ -173,8 +207,8 @@ function getPokemonData(id) {
     })
 }
 
-function changedArrayToPrepareForEJSRender (arr) {
-  return arr.map(type =>{
+function changedArrayToPrepareForEJSRender(arr) {
+  return arr.map(type => {
     let whole = type;
 
     // whole.type_primary_id =  getTypeName(type.type_primary_id);
@@ -187,24 +221,55 @@ function showSearch(request, response) {
   if (request.body.pages === undefined){SQL += 'LIMIT 50'}
   if (request.body.pages){ SQL += `ORDER BY national_dex_id OFFSET ${parseInt(request.body.pages)* 50} FETCH NEXT 50 ROWS ONLY`}
 
+
   return client.query(SQL)
     .then(result => {
-      response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
+      response.render('./pages/search', { result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'] }
       )
-      // .catch(error => handleError(error, response));
-    });
+    })
+    .catch(err => handleError(err, response))
 }
 
 function searchBy(request, response) {
   let SQL = 'SELECT * FROM species WHERE ';
+
   if(request.body.search) {SQL += `name='${request.body.search}'`}
   if(request.body.search === '') {SQL += `type_primary_id='${parseInt(request.body.types)}'`}
+
   return client.query(SQL)
     .then(result => {
-      response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
+      response.render('./pages/search', { result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'] }
       )
-      // .catch(error => handleError(error, response));
     })
+    .catch(err => handleError(err, response))
+}
+
+function showFavorites(request, response) {
+  let SQL = 'SELECT * FROM species ';
+  let fullArr = [];
+
+  return client.query(SQL)
+    .then (allPokemon => {
+      fullArr = (allPokemon.rows);
+      client.query(`SELECT * FROM favorites;`)
+        .then((favorites) => {
+          let favoritesArr = [];
+          let values = favorites.rows.map( faves => faves.id).sort( (a, b) => a - b);
+
+          fullArr.forEach( (val) => {
+            values.forEach( (faveVal) => {
+              if (val.national_dex_id === faveVal) {
+                favoritesArr.push(val)
+              }
+            })
+          })
+
+          response.render('./pages/favorites', {result: favoritesArr, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']}
+          )
+        })
+        .catch(err => handleError(err, response))
+    })
+    .catch(err => handleError(err, response))
 }
 
 function buildTypeDamageMods(i) {
@@ -285,10 +350,10 @@ function getDamageMods(typeOne, typeTwo) {
   let typeTwoModList = [];
   return client.query(`SELECT type_damage_from_multiplier FROM types_damage_from WHERE type_id=${typeOneIndex};`)
     .then((typeOneResult) => {
-      typeOneModList = typeOneResult.rows.map((row) => {return row.type_damage_from_multiplier});
+      typeOneModList = typeOneResult.rows.map((row) => { return row.type_damage_from_multiplier });
       return client.query(`SELECT type_damage_from_multiplier FROM types_damage_from WHERE type_id=${typeTwoIndex};`)
         .then((typeTwoResult) => {
-          typeTwoModList = typeTwoResult.rows.map((row) => {return row.type_damage_from_multiplier});
+          typeTwoModList = typeTwoResult.rows.map((row) => { return row.type_damage_from_multiplier });
 
           output = output.map((element, index) => {
             return element * typeOneModList[index - 1] * typeTwoModList[index - 1]
@@ -382,19 +447,29 @@ function getMoveData(id) {
 }
 
 function addFavorite(request, response) {
-  let SQL = `INSERT INTO favorites (id) VALUES ($1);`;
-  let values = [request.params.id];
+  let SQL = `INSERT INTO favorites(id) VALUES($1);`;
+  let value = [request.body.data];
 
-  client.query(SQL, values)
-    .then(result => response.send(result))
+  client.query(SQL, value)
+    .then(result => {
+      result = ['invisible'];
+      response.send(result)
+    })
+    .catch(error => handleError(error, response));
+
 }
 
 function deleteFavorite(request, response) {
   let SQL = `DELETE FROM favorites WHERE id=$1;`;
-  let values = [request.params.id];
+  let values = [request.body.data];
 
   client.query(SQL, values)
-    .then(result => response.send(result))
+    .then(result => {
+      result = ['invisible'];
+      response.send(result)
+    })
+    .catch(error => handleError(error, response));
+
 }
 
 function handleError(error, response) {
@@ -406,39 +481,67 @@ function handleError(error, response) {
 //   app.use(express.static('./public'));
 // }
 
-// Initial database build, should be called iff database is 100% empty
+// Initial database build, each part should be called iff database is 100% empty
 function buildIfEmpty() {
+  // used to set calls back to back, instead of all at once
+  let delay = 0;
+
+  // If types arn't populated, build them - needed for foreign keys
   client.query(`SELECT * FROM types`)
     .then((result) => {
-      if (result.rows.length === 0) {
+      if (result.rows.length === 1) {
+        console.log('Types list is empty, building...')
         buildTypeList();
+        delay += 2;
       }
     })
 
+  // Species list is needed for searching
   client.query(`SELECT * FROM species`)
     .then((result) => {
-      if (result.rows.length === 0)
+      if (result.rows.length === 0) {
         for (let i = 1; i < 808; i++) {
-          setTimeout(buildPokemonDatabase, i * 2000, i);
-          console.log(`Added #${i}`);
+          setTimeout(buildPokemonDatabase, (i + delay) * 2000, i);
+
         }
+        console.log('Pokemon list is empty, building...')
+        delay += 1614;
+      }
     })
 
+  // Type damag relations are needed for strength/weakness charts
   client.query(`SELECT * FROM types_damage_to`)
     .then((result) => {
       if (result.rows.length === 0) {
         for (let i = 1; i < 19; i++) {
-          setTimeout(buildTypeDamageMods, i * 1000, i);
+          setTimeout(buildTypeDamageMods, (i + delay) * 1000, i);
         }
+        console.log('Weaknesses list is empty, building...');
+        delay += 40;
       }
+
     })
 
+  // always a single call, it can slot in wherever
+  // Displays what a move can target, foreign key for moves
   client.query(`SELECT * FROM target_type`)
     .then((result) => {
       if (result.rows.length === 0) {
         buildTargetTypes();
+        console.log('Move targetting types list is empty, building...');
+      }
+    })
+
+  // Will be needed as foreign key for movelist with details
+  client.query('SELECT * FROM moves')
+    .then((result) => {
+      if (result.rows.length === 0) {
+        for (let i = 1; i < 728; i++) {
+          setTimeout(getMoveData, (i + delay) * 1000, i);
+        }
+        console.log('Moves list is empty, building...');
       }
     })
 }
 
-buildIfEmpty();
+// buildIfEmpty();

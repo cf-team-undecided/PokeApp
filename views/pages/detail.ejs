@@ -9,17 +9,17 @@
   <div class="wrapper">
     <div class="poke-box">
       <%- include('../partials/favorite-button') %>
+      <h2 id="name"><%= pokemon.name %></h2>
+      <h2 id="id">National ID: <%= pokemon.id %></h2>
       <img src="<%= pokemon.image_url %>" alt="<%= pokemon.name%>">
-      <h2><%= pokemon.id %></h2>
-      <h2><%= pokemon.name %></h2>
       <ul>
         <li>HT: <%= pokemon.height %>m</li>
         <li>WT: <%= pokemon.weight %>kg</li>
       </ul>
       <div class="type-box">
         <ul>
-          <li class="<%= pokemon.typeOne %>"> <%= pokemon.typeOne %> </li>
-          <li class="<%= pokemon.typeTwo %>"> <%= pokemon.typeTwo %> </li>
+          <li class="<%= pokemon.typeOne %>">Type One: <%= pokemon.typeOne %> </li>
+          <li class="<%= pokemon.typeTwo %>">Type Two: <%= pokemon.typeTwo %> </li>
         </ul>
       </div>
     </div>
@@ -41,7 +41,7 @@
     </div>
     <div class="description-box"><%= pokemon.description %></div>
     <div class="move-box">
-      <table>
+      <table class="move-table">
         <tr>
           <th>Level Learned</th>
           <th>Name</th>

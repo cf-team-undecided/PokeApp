@@ -1,9 +1,18 @@
+@font-face {
+  font-family: Pokemon;
+  src: url('../style/fonts/Pokemon-Hollow.ttf');
+  font-family: Pokemon-solid;
+  src: url('../style/fonts/Pokemon-Solid.ttf')
+}
+
 .wrapper {
+  max-width: 70%;
   background: #37505C;
   display: grid;
   grid-template-rows: auto;
   grid-gap: 5px;
   grid-template-columns: 5% 90% 5%;
+  margin: auto;
 }
 
 .wrapper ul {
@@ -19,18 +28,35 @@
 }
 
 .poke-box {
-  background-color: #DBCBD8;
+  border: 20px solid #b2ada9;
   grid-area: 2 / 2 / 2 / 2;
 }
 
 .poke-box img {
-  float: left;
-  width: 40%;
+  width: 50%;
   height: 60%;
+  display: block;
+  margin: auto;
 }
 
-.poke-box span {
+.poke-box h2 {
+  font-size: 150%;
+  padding: 1%;
+  text-shadow: 2px 2px black;
+}
+
+#id {
+  font-family: Pokemon-solid;
+  color: #75be20;
   display: block;
+  margin-left: 40%;
+}
+
+#name {
+  font-family: Pokemon-solid;
+  color: #cddf6a;
+  display: block;
+  margin-left: 40%;
 }
 
 .strength-box {
@@ -39,36 +65,56 @@
 
 .strength-box li {
   border-radius: 10px;
-  background: grey;
 }
 
 .weakness-box {
   grid-area: 4 / 1 / 4 / 4;
 }
 
-.weakness-box span {
-  border-radius: 10px;
-  background: brown;
-}
-
 .description-box {
-  background-color: #DBCBD8;
+  background-color: #c4d0d9;
   grid-area: 5 / 1 / 5 / 4;
+  height: 140%;
 }
 
 .move-box {
-  background: lightcoral;
+  background: #9d9c9a;
   grid-area: 6 / 1 / 6 / 4;
 }
 
+.type-box li{
+  display: block;
+  color: pink;
+}
 
-@media screen and (min-width: 425px) and (max-width: 767px) {
+.move-table {
+  font-size: 120%;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.move-table td, .move-table th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.move-table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #a69e70;
+  color: white;
+}
+
+
+
+/* @media screen and (min-width: 425px) and (max-width: 767px) {
 
 }
 
 @media screen and (min-width: 768px) {
 
-}
+} */
 
 /* Grid styles -------------------------------------------------*/
 .cards {
@@ -77,38 +123,36 @@
   grid-gap: 10px;
 }
 
-.cards {
-  max-width: 960px;
-  margin: 0 auto 30px;
-}
-
 .row {
   position: relative;
   border: 1px solid black;
 }
 
 .row h2 {
-  position: absolute;
-  left: 50%;
-  top: 10%;
-  width: 100%;
   padding: 10px;
+  text-align: center;
+  font-size: 150%;
+}
+
+.pokemon-title {
+  font-family: Pokemon-solid;
+  color: #cddf6a;
+  text-shadow: 2px 2px black;
 }
 
 .row-article {
   height: 200px;
   width: 100%;
-  /* object-fit: cover; */
 }
 
-.home-page {
-  max-width: 80%;
-  margin: auto;
-}
 
 /* *********************************** */
 /* Home Page CSS */
 /* *********************************** */
+.home-page {
+  max-width: 80%;
+  margin: auto;
+}
 
 .home-page section {
   margin: 10%;
