@@ -1,5 +1,5 @@
 <div>
-  <h6 id="favorite-text" display="none"></h6>
+  <div id="favorite-text" display="none"></div>
   <form class="<%= (pokemon.favoritesArr.includes(pokemon.id) ? 'hidden toggle' : 'toggle') %>" id="add-favorite" >
     <input type="hidden" name="id" id="add" value="<%= pokemon.id %>" />
     <button class="star" type="submit"><span>&#9734</span></button>
