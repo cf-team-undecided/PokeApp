@@ -31,7 +31,7 @@ app.set('view engine', 'ejs');
 app.get('/', (request, response) => {
   getRandomPokemon()
     .then( (randomMon) => {
-      response.render('./index', {pokemon: randomMon})
+      response.render('./index', {random: randomMon})
     })
 });
 
@@ -48,6 +48,8 @@ app.get('/details/:id', displayDetails);
 app.post('/add/', addFavorite);
 
 app.delete('/delete', deleteFavorite);
+
+app.get('/about-us', aboutUs);
 
 app.get('*', (request, response) => response.status(404).send('This route does not exist'));
 
@@ -91,7 +93,7 @@ function showSearch(request, response) {
 
       return client.query(SQL)
         .then(result => {
-          response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'], pokemon: randomMon})
+          response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'], random: randomMon})
         })
     })
     .catch(err => handleError(err, response))
@@ -110,14 +112,20 @@ function searchBy(request, response) {
 
       return client.query(SQL)
         .then(result => {
-          response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'], pokemon: randomMon}
+          response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'], random: randomMon}
           )
         })
     })
     .catch(err => handleError(err, response))
 }
 
-// Displays all favorited Pokemon
+function aboutUs (request, response) {
+  return getRandomPokemon()
+    .then( (randomMon) => {
+      response.render('./pages/about-us', { random: randomMon });
+    })
+}
+
 function showFavorites(request, response) {
   let SQL = 'SELECT * FROM species ';
   let fullArr = [];
@@ -142,7 +150,7 @@ function showFavorites(request, response) {
                 })
               })
 
-              response.render('./pages/favorites', {results: favoritesArr, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'], pokemon: randomMon}
+              response.render('./pages/favorites', {results: favoritesArr, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'], random: randomMon}
               )
             })
         })
@@ -193,9 +201,9 @@ function displayDetails(request, response) {
                             move.type_id = getTypeName(move.type_id);
                           })
                           // Render results
-                          response.render(`pages/detail`, { results: details, pokemon: randomMon })    
+                          response.render(`pages/detail`, { results: details, random: randomMon })    
                         })
-                      })
+                    })
                 })
             })
         })
@@ -512,4 +520,4 @@ function getMoveList(id) {
     })
 }
 
-buildIfEmpty();
+// buildIfEmpty();

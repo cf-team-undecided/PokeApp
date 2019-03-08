@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include('../partials/head') %>
+    <link rel="stylesheet" type="text/css" href="/style/modules/favorite-button.css" />
+  </head>
+  <body>
+      <%- include('../partials/head', {random: random}) %>
+      <div class="wrapper">
+      <div class="top-box">
+        <ul>
+          <li>FIND ME</li>
+          <li>MOVES</li>
+          <li>EVOLVE</li>
+        </ul>
+      </div>
+      <div class="poke-box">
+        <img src="https://img.pokemondb.net/sprites/diamond-pearl/normal/snorlax.png" alt="Snorlax">
+        <h2>№ 143 snorlax</h2>
+        <span>Sleeping Pokémon</span>
+        <span>HT: 2.1 m</span>
+        <span>WT: 460.0 kg</span>
+      </div>
+      <div class="type-box">
+        <ul>
+          <li>Normal</li>
+          <li></li>
+        </ul>
+      </div>
+      <div class="against-box">
+        <ul>
+          <li>Weakness: <span>Fighting</span></li>
+          <li></li>
+        </ul>
+        <ul>
+          <li>Strong versus: </li>
+          <li></li>
+        </ul>
+      </div>
+        <div class="description-box">It eats nearly 900 pounds of food every day. It starts nodding off while eating—and continues to eat even while it’s asleep.</div>
+    </div>
+    <%- include('../partials/jquery')%>
+    </body>
+</html>

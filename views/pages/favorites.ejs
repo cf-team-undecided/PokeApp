@@ -7,7 +7,7 @@
 </head>
 
 <body>
-  <%- include('./../partials/header', {pokemon: pokemon}) %>
+  <%- include('../partials/head', {random: random}) %>
   <main class="cards">
     <% results.forEach(pokemon => { %>
       <%- include('./../partials/row', {pokemon: pokemon}) %>
