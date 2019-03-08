@@ -30,8 +30,8 @@ app.set('view engine', 'ejs');
 
 app.get('/', (request, response) => {
   getRandomPokemon()
-    .then( (randomMon) => {
-      response.render('./index', {random: randomMon})
+    .then((randomMon) => {
+      response.render('./index', { random: randomMon })
     })
 });
 
@@ -84,16 +84,16 @@ function PokemonDetails(pokemon) {
 function showSearch(request, response) {
   let SQL = 'SELECT * FROM species ';
 
-  if (request.body.pages === undefined) { SQL += 'LIMIT 20' }
-  if (request.body.pages) { SQL += `ORDER BY national_dex_id OFFSET ${parseInt(request.body.pages) * 20} FETCH NEXT 20 ROWS ONLY` }
+  if (request.body.pages === undefined) { SQL += 'LIMIT 50' }
+  if (request.body.pages) { SQL += `ORDER BY national_dex_id OFFSET ${parseInt(request.body.pages) * 50} FETCH NEXT 50 ROWS ONLY` }
 
   // Get the random Pokemon object
   return getRandomPokemon()
-    .then( (randomMon) => {
+    .then((randomMon) => {
 
       return client.query(SQL)
         .then(result => {
-          response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'], random: randomMon})
+          response.render('./pages/search', { result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'], random: randomMon })
         })
     })
     .catch(err => handleError(err, response))
@@ -101,6 +101,9 @@ function showSearch(request, response) {
 
 // Re-renders search page based on type selected from dropdown
 function searchBy(request, response) {
+  if (request.body.types === '0') {
+    response.redirect('/search');
+  }
   let SQL = 'SELECT * FROM species WHERE ';
 
   if (request.body.search) { SQL += `name='${request.body.search}'` }
@@ -108,20 +111,20 @@ function searchBy(request, response) {
 
   // Get the random Pokemon object
   return getRandomPokemon()
-    .then( (randomMon) => {
+    .then((randomMon) => {
 
       return client.query(SQL)
         .then(result => {
-          response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'], random: randomMon}
+          response.render('./pages/search', { result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'], random: randomMon }
           )
         })
     })
     .catch(err => handleError(err, response))
 }
 
-function aboutUs (request, response) {
+function aboutUs(request, response) {
   return getRandomPokemon()
-    .then( (randomMon) => {
+    .then((randomMon) => {
       response.render('./pages/about-us', { random: randomMon });
     })
 }
@@ -132,25 +135,25 @@ function showFavorites(request, response) {
 
   // Get the random Pokemon object
   return getRandomPokemon()
-    .then( (randomMon) => {
+    .then((randomMon) => {
 
       return client.query(SQL)
-        .then (allPokemon => {
+        .then(allPokemon => {
           fullArr = (allPokemon.rows);
           client.query(`SELECT * FROM favorites;`)
             .then((favorites) => {
               let favoritesArr = [];
-              let values = favorites.rows.map( faves => faves.id).sort( (a, b) => a - b);
+              let values = favorites.rows.map(faves => faves.id).sort((a, b) => a - b);
 
-              fullArr.forEach( (val) => {
-                values.forEach( (faveVal) => {
+              fullArr.forEach((val) => {
+                values.forEach((faveVal) => {
                   if (val.national_dex_id === faveVal) {
                     favoritesArr.push(val)
                   }
                 })
               })
 
-              response.render('./pages/favorites', {results: favoritesArr, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'], random: randomMon}
+              response.render('./pages/favorites', { results: favoritesArr, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'], random: randomMon }
               )
             })
         })
@@ -165,32 +168,32 @@ function displayDetails(request, response) {
 
   // Get the random Pokemon object
   return getRandomPokemon()
-    .then( (randomMon) => {
+    .then((randomMon) => {
 
       return client.query(SQL, value)
-        .then( (results) => {
+        .then((results) => {
           let details = new PokemonDetails(results.rows[0])
 
           // Get favorites array to check if selected Pokemon is favorited
           client.query(`SELECT * FROM favorites;`)
             .then((favorites) => {
-              favorites.rows.forEach( (faves) => details.favoritesArr.push(faves.id));
+              favorites.rows.forEach((faves) => details.favoritesArr.push(faves.id));
 
               // Check Pokemon's type to determine weaknesses and strengths
               getDamageMods(details.typeOne, details.typeTwo)
-                .then( (modResults) => {
-                  modResults.forEach( (val, idx) => {
-                    if( val > 1 ) {
+                .then((modResults) => {
+                  modResults.forEach((val, idx) => {
+                    if (val > 1) {
                       details.weak.push(getTypeName(idx));
                     }
-                    if( val < 1 ) {
+                    if (val < 1) {
                       details.strong.push(getTypeName(idx));
                     }
                   })
 
                   // Query the API for the Pokemon's flavor text and move list
                   getFlavorText(details.id)
-                    .then( (flavorResults) => {
+                    .then((flavorResults) => {
                       details.description = flavorResults.split('\n').join(' ')
 
                       // Query the database to get move details if available, or get them from the API
@@ -201,7 +204,7 @@ function displayDetails(request, response) {
                             move.type_id = getTypeName(move.type_id);
                           })
                           // Render results
-                          response.render(`pages/detail`, { results: details, random: randomMon })    
+                          response.render(`pages/detail`, { results: details, random: randomMon })
                         })
                     })
                 })
@@ -217,7 +220,7 @@ function getRandomPokemon() {
   let randomPokemon = Math.ceil(Math.random() * Math.ceil(802));
   let value = [randomPokemon];
   return client.query(SQL, value)
-    .then( (results) => {
+    .then((results) => {
       return results.rows[0];
     })
 }

@@ -1,7 +1,8 @@
 <form action="/searchBy" method="POST" id="search-form">
   <input type="text" id="enter-name" placeholder="Enter a pokemon" name="search"></input>
   <select onchange="this.form.submit()" name="types" id="pokemonTypes" form="search-form">
-      <option value="0">none</option>
+      <option default hidden>Browse By Type</option>
+      <option value="0">all</option>
       <option value="1">normal</option>
       <option value="2">fighting</option>
       <option value="3">flying</option>
