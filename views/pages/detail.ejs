@@ -5,7 +5,7 @@
     <link rel="stylesheet" type="text/css" href="/style/modules/favorite-button.css" />
   </head>
   <body>
-  <%- include('../partials/header') %>
+  <%- include('./../partials/header', {pokemon: pokemon}) %>
   <div class="wrapper">
     <div class="poke-box">
       <%- include('../partials/favorite-button') %>
@@ -13,8 +13,8 @@
       <h2 id="id">National ID: <%= pokemon.id %></h2>
       <img src="<%= pokemon.image_url %>" alt="<%= pokemon.name%>">
       <ul>
-        <li>HT: <%= pokemon.height %>m</li>
-        <li>WT: <%= pokemon.weight %>kg</li>
+        <li>HT: <%= results.height %>m</li>
+        <li>WT: <%= results.weight %>kg</li>
       </ul>
       <div class="type-box">
         <ul>
@@ -26,7 +26,7 @@
     <div class="strength-box">
       <ul>
         <li>Strong against: </li>
-        <% pokemon.strong.forEach( (strong) => { %>
+        <% results.strong.forEach( (strong) => { %>
         <li class="<%= strong %>"><%= strong %></li>
         <% }) %>
       </ul>
@@ -34,19 +34,19 @@
     <div class="weakness-box">
       <ul>
         <li>Weak against: </li>
-        <% pokemon.weak.forEach( (weak) => { %>
+        <% results.weak.forEach( (weak) => { %>
         <li class="<%= weak %>"><%= weak %></li>
         <% }) %>
       </ul>
     </div>
-    <div class="description-box"><%= pokemon.description %></div>
+    <div class="description-box"><%= results.description %></div>
     <div class="move-box">
       <table class="move-table">
         <tr>
           <th>Level Learned</th>
           <th>Name</th>
         </tr>
-        <% pokemon.moves.forEach( (move) => { %>
+        <% results.moves.forEach( (move) => { %>
         <tr>
           <td><%= move[0] %></td>
           <td><%= move[1] %></td>

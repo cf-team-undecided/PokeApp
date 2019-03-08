@@ -7,10 +7,10 @@
 </head>
 
 <body>
-  <%- include('./../partials/header') %>
+  <%- include('./../partials/header', {pokemon: pokemon}) %>
   <main class="cards">
-    <% result.forEach(pokemon => { %>
-      <%- include('../partials/row', {pokemon: pokemon}) %>
+    <% results.forEach(pokemon => { %>
+      <%- include('./../partials/row', {pokemon: pokemon}) %>
     <% }); %>
   </main>
   <%- include('../partials/page-numbers') %>
