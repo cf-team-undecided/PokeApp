@@ -204,9 +204,7 @@ function displayDetails(request, response) {
                             move.type_id = getTypeName(move.type_id);
                           })
                           // Render results
-                          console.log('unsorted', details.moves)
                           details.moves.sort( (a, b) => a.level_learned - b.level_learned)
-                          console.log('sorted', details.moves)
                           response.render(`pages/detail`, { results: details, random: randomMon })
                         })
                     })
