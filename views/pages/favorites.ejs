@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Favorite Pokémon</title>
+  <%- include('../partials/head') %>
+</head>
+
+<body>
+  <%- include('../partials/head', {random: random}) %>
+  <main class="cards">
+    <% results.forEach(pokemon => { %>
+      <%- include('./../partials/row', {pokemon: pokemon}) %>
+    <% }); %>
+  </main>
+  <%- include('../partials/page-numbers') %>
+</body>
+
+</html>

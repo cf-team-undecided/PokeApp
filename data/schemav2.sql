@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS damage_class (
 
 CREATE TABLE IF NOT EXISTS moves (
   api_id INTEGER PRIMARY KEY,
-  name VARCHAR(20),
+  name VARCHAR(40),
   power INTEGER,
   accuracy INTEGER,
   target_type_id INTEGER,
@@ -83,3 +83,29 @@ CREATE TABLE IF NOT EXISTS types_damage_from (
 
 -- Default null type, API doesn't give one, is needed for foreign key constraints
 INSERT INTO types(api_id, name) VALUES (0, 'none');
+
+DROP TABLE IF EXISTS favorites;
+
+CREATE TABLE IF NOT EXISTS favorites (
+  id INTEGER PRIMARY KEY
+);
+
+-- Adds additional table for flavor text
+
+DROP TABLE IF EXISTS flavor_text;
+
+CREATE TABLE IF NOT EXISTS flavor_text(
+  species_id INTEGER,
+  text TEXT,
+  FOREIGN KEY (species_id) REFERENCES species(national_dex_id)
+);
+
+-- Adds damage class entries by hand, only 3 entries, no need to go to the api
+
+-- Damage class table is malformed, fixes
+ALTER TABLE damage_class DROP COLUMN IF EXISTS decription;
+ALTER TABLE damage_class ADD COLUMN IF NOT EXISTS description TEXT;
+
+INSERT INTO damage_class(api_id, description) VALUES(1, 'status');
+INSERT INTO damage_class(api_id, description) VALUES(2, 'physical');
+INSERT INTO damage_class(api_id, description) VALUES(3, 'special');

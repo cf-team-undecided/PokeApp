@@ -1,0 +1,21 @@
+.star {
+  max-height: 3rem;
+  max-width: 3rem;
+  padding: .3rem .5rem;
+  font-size: 2rem;
+  color: gold;
+  background: white;
+  border: none;
+  cursor: pointer;
+
+}
+
+.hidden {
+  display: none;
+
+}
+
+.invisible {
+  visibility: hidden;
+
+}

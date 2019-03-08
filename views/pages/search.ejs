@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>PokéSearch</title>
+  <%- include('../partials/head', {random: random}) %>
+</head>
+
+<body>
+  <%- include('./../partials/header') %>
+  <div id="forms">
+  <%- include('../partials/search-form') %>
+  <%- include('../partials/page-numbers') %>
+  </div>
+  <main class="cards">
+    <% result.forEach(pokemon => { %>
+      <%- include('../partials/row', {pokemon: pokemon}) %>
+    <% }); %>
+  </main>
+</body>
+</html>

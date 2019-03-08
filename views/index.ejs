@@ -1,14 +1,20 @@
 <!DOCTYPE html>
 <head>
-  <title>Hello World!</title>
+  <title>Pokédex!</title>
   <%- include('partials/head') %>
 </head>
 <body>
-  <main>
-    <h1>Hello World!</h1>
-    <div>
-      <img src="https://via.placeholder.com/250" />
-    </div>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce commodo erat quis laoreet ultricies. Quisque vulputate at nisi ut pulvinar. Integer odio lorem, molestie vel viverra id, consectetur at ante. Etiam consequat nulla eu lacus sagittis convallis et ac ipsum. Aenean eget elit pharetra, faucibus neque sit amet, vehicula sapien. Proin commodo velit vel odio mollis vestibulum. Nam in commodo sem, ac gravida leo. Aliquam id metus ligula. Aliquam quis leo vitae magna vulputate imperdiet sed in arcu. Maecenas in interdum orci. Curabitur iaculis risus sagittis lectus tempor, vel imperdiet odio pulvinar.</p>
+  <%- include('./partials/header') %>
+  <main class="home-page">
+    <section class="">
+    <a href="/search">
+      <img class="search-button" src="/images/search.png" />
+    </a>
+    </section>
+    <section class="">
+    <a href="/favorites">
+      <img class="fav-button" src="/images/faves.png" />
+    </a>
+    </section>
   </main>
 </body>
