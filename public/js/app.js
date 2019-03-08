@@ -13,8 +13,7 @@ function addFavorite(event) {
     url: '/add',
     method: 'POST',
     data: {data: add},
-    success: function(result) {
-      $('#favorite-text').removeClass(result)
+    success: function() {
       $('#favorite-text').nextAll('.toggle').toggle();
     }
   })
@@ -28,8 +27,7 @@ function deleteFavorite(event) {
     url: '/delete',
     method: 'DELETE',
     data: {data: del},
-    success: function(result) {
-      $('#favorite-text').addClass(result)
+    success: function() {
       $('#favorite-text').nextAll('.toggle').toggle();
     }
   })

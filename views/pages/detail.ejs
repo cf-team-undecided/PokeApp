@@ -5,28 +5,28 @@
     <link rel="stylesheet" type="text/css" href="/style/modules/favorite-button.css" />
   </head>
   <body>
-  <%- include('../partials/header') %>
+  <%- include('./../partials/header', {pokemon: pokemon}) %>
   <div class="wrapper">
     <div class="poke-box">
-      <%- include('../partials/favorite-button') %>
-      <img src="<%= pokemon.image_url %>" alt="<%= pokemon.name%>">
-      <h2><%= pokemon.id %></h2>
-      <h2><%= pokemon.name %></h2>
+      <%- include('../partials/favorite-button', {pokemon: results}) %>
+      <img src="<%= results.image_url %>" alt="<%= results.name%>">
+      <h2><%= results.id %></h2>
+      <h2><%= results.name %></h2>
       <ul>
-        <li>HT: <%= pokemon.height %>m</li>
-        <li>WT: <%= pokemon.weight %>kg</li>
+        <li>HT: <%= results.height %>m</li>
+        <li>WT: <%= results.weight %>kg</li>
       </ul>
       <div class="type-box">
         <ul>
-          <li class="<%= pokemon.typeOne %>"> <%= pokemon.typeOne %> </li>
-          <li class="<%= pokemon.typeTwo %>"> <%= pokemon.typeTwo %> </li>
+          <li class="<%= results.typeOne %>"> <%= results.typeOne %> </li>
+          <li class="<%= results.typeTwo %>"> <%= results.typeTwo %> </li>
         </ul>
       </div>
     </div>
     <div class="strength-box">
       <ul>
         <li>Strong against: </li>
-        <% pokemon.strong.forEach( (strong) => { %>
+        <% results.strong.forEach( (strong) => { %>
         <li class="<%= strong %>"><%= strong %></li>
         <% }) %>
       </ul>
@@ -34,12 +34,12 @@
     <div class="weakness-box">
       <ul>
         <li>Weak against: </li>
-        <% pokemon.weak.forEach( (weak) => { %>
+        <% results.weak.forEach( (weak) => { %>
         <li class="<%= weak %>"><%= weak %></li>
         <% }) %>
       </ul>
     </div>
-    <div class="description-box"><%= pokemon.description %></div>
+    <div class="description-box"><%= results.description %></div>
     <div class="move-box">
       <table>
         <tr>
@@ -47,7 +47,7 @@
           <th>Name</th>
           <th>Type</th>
         </tr>
-        <% pokemon.moves.forEach( (move) => { %>
+        <% results.moves.forEach( (move) => { %>
         <tr>
           <td><%= move.level_learned %></td>
           <td><%= move.name %></td>

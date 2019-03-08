@@ -3,7 +3,6 @@
 // App Dependencies
 const express = require('express');
 const superagent = require('superagent');
-// const methodOverride = require('method-override');
 const pg = require('pg');
 
 // Load environment variables from .env file
@@ -27,19 +26,15 @@ app.use(express.static('./public'));
 // Set the view engine for templating
 app.set('view engine', 'ejs');
 
-// Middleware to handle DELETE
-// app.use(methodOverride((request, response) => {
-//   if (request.body && typeof request.body === 'object' && '_method' in request.body) {
-//     // look in urlencoded POST bodies and delete it
-//     let method = request.body._method;
-//     delete request.body._method;
-//     return method;
-//   }
-// }))
-
 // Routes
 
-app.get('/', (request, response) => response.render('./index'));
+app.get('/', (request, response) => {
+  getRandomPokemon()
+    .then( (randomMon) => {
+      console.log('rando', randomMon)
+      response.render('./index', {pokemon: randomMon})
+    })
+});
 
 app.get('/search', showSearch);
 
@@ -87,6 +82,7 @@ function PokemonDetails(pokemon) {
   this.description = '';
   this.moves = [];
   this.favoritesArr = [];
+  this.randomMon = [];
 
 }
 
@@ -98,6 +94,8 @@ function displayDetails(request, response) {
   let SQL = `SELECT * FROM species WHERE national_dex_id=$1`
   let value = [request.params.id];
 
+  return getRandomPokemon()
+  .then( (randomMon) => {
 
 
   return client.query(SQL, value)
@@ -134,6 +132,7 @@ function displayDetails(request, response) {
                       })
                       console.log(details);
                       response.render(`pages/detail`, { pokemon: details })
+
                     })
                     
                     //refactored just above
@@ -151,22 +150,24 @@ function displayDetails(request, response) {
                   //     response.render(`pages/detail`, { pokemon: details })
                   //   })
                     .catch(err => handleError(err, response))
-                })
-                .catch(err => handleError(err, response))
-            })
-            .catch(err => handleError(err, response))
-        })
-        .catch(err => handleError(err, response))
-    })
+                  })
+                  .catch(err => handleError(err, response))
+              })
+              .catch(err => handleError(err, response))
+          })
+          .catch(err => handleError(err, response))
+      })
     .catch(err => handleError(err, response))
 }
 
 function getRandomPokemon() {
-  let SQL = `SELECT * FROM species WHERE id=$1;`;
+  let SQL = `SELECT * FROM species WHERE national_dex_id=$1;`;
   let randomPokemon = Math.ceil(Math.random() * Math.ceil(807));
   let value = [randomPokemon];
-
-  return client.query(SQL, value);
+  return client.query(SQL, value)
+    .then( (results) => {
+      return results.rows[0];
+    })
 }
 
 function buildPokemonDatabase(id) {
@@ -235,11 +236,14 @@ function showSearch(request, response) {
   if (request.body.pages === undefined) { SQL += 'LIMIT 20' }
   if (request.body.pages) { SQL += `ORDER BY national_dex_id OFFSET ${parseInt(request.body.pages) * 20} FETCH NEXT 20 ROWS ONLY` }
 
+  return getRandomPokemon()
+    .then( (randomMon) => {
 
-  return client.query(SQL)
-    .then(result => {
-      response.render('./pages/search', { result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'] }
-      )
+      return client.query(SQL)
+        .then(result => {
+          console.log('normal', result.rows[0])
+          response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'], pokemon: randomMon})
+        })
     })
     .catch(err => handleError(err, response))
 }
@@ -250,10 +254,14 @@ function searchBy(request, response) {
   if (request.body.search) { SQL += `name='${request.body.search}'` }
   if (request.body.search === '') { SQL += `type_primary_id='${parseInt(request.body.types)}'` }
 
-  return client.query(SQL)
-    .then(result => {
-      response.render('./pages/search', { result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'] }
-      )
+  return getRandomPokemon()
+    .then( (randomMon) => {
+
+      return client.query(SQL)
+        .then(result => {
+          response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'], pokemon: randomMon}
+          )
+        })
     })
     .catch(err => handleError(err, response))
 }
@@ -262,26 +270,29 @@ function showFavorites(request, response) {
   let SQL = 'SELECT * FROM species ';
   let fullArr = [];
 
-  return client.query(SQL)
-    .then(allPokemon => {
-      fullArr = (allPokemon.rows);
-      client.query(`SELECT * FROM favorites;`)
-        .then((favorites) => {
-          let favoritesArr = [];
-          let values = favorites.rows.map(faves => faves.id).sort((a, b) => a - b);
+  return getRandomPokemon()
+    .then( (randomMon) => {
 
-          fullArr.forEach((val) => {
-            values.forEach((faveVal) => {
-              if (val.national_dex_id === faveVal) {
-                favoritesArr.push(val)
-              }
+      return client.query(SQL)
+        .then (allPokemon => {
+          fullArr = (allPokemon.rows);
+          client.query(`SELECT * FROM favorites;`)
+            .then((favorites) => {
+              let favoritesArr = [];
+              let values = favorites.rows.map( faves => faves.id).sort( (a, b) => a - b);
+
+              fullArr.forEach( (val) => {
+                values.forEach( (faveVal) => {
+                  if (val.national_dex_id === faveVal) {
+                    favoritesArr.push(val)
+                  }
+                })
+              })
+
+              response.render('./pages/favorites', {results: favoritesArr, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'], pokemon: randomMon}
+              )
             })
-          })
-
-          response.render('./pages/favorites', { result: favoritesArr, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'] }
-          )
         })
-        .catch(err => handleError(err, response))
     })
     .catch(err => handleError(err, response))
 }
