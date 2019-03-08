@@ -6,11 +6,11 @@
   <%- include('../partials/head', {random: random}) %>
 </head>
 
-<body>
+<body class="pagey">
   <%- include('./../partials/header') %>
   <div id="forms">
-  <%- include('../partials/search-form') %>
-  <%- include('../partials/page-numbers') %>
+    <%- include('../partials/search-form') %>
+    <%- include('../partials/page-numbers') %>
   </div>
   <main class="cards">
     <% result.forEach(pokemon => { %>
@@ -18,4 +18,4 @@
     <% }); %>
   </main>
 </body>
-</html>
+</html> 
