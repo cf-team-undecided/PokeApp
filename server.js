@@ -95,54 +95,54 @@ function displayDetails(request, response) {
   let value = [request.params.id];
 
   return getRandomPokemon()
-  .then( (randomMon) => {
+    .then( (randomMon) => {
 
-    return client.query(SQL, value)
-      .then( (results) => {
-        let details = new PokemonDetails(results.rows[0])
+      return client.query(SQL, value)
+        .then( (results) => {
+          let details = new PokemonDetails(results.rows[0])
 
-        client.query(`SELECT * FROM favorites;`)
-          .then((favorites) => {
-            favorites.rows.forEach( (faves) => details.favoritesArr.push(faves.id));
+          client.query(`SELECT * FROM favorites;`)
+            .then((favorites) => {
+              favorites.rows.forEach( (faves) => details.favoritesArr.push(faves.id));
 
-            getDamageMods(details.typeOne, details.typeTwo)
-              .then( (modResults) => {
-                modResults.forEach( (val, idx) => {
-                  if( val > 1 ) {
-                    details.weak.push(getTypeName(idx));
-                  }
-                  if( val < 1 ) {
-                    details.strong.push(getTypeName(idx));
-                  }
-                })
+              getDamageMods(details.typeOne, details.typeTwo)
+                .then( (modResults) => {
+                  modResults.forEach( (val, idx) => {
+                    if( val > 1 ) {
+                      details.weak.push(getTypeName(idx));
+                    }
+                    if( val < 1 ) {
+                      details.strong.push(getTypeName(idx));
+                    }
+                  })
 
-                getFlavorText(details.id)
-                  .then( (flavorResults) => {
-                    let url = `https://pokeapi.co/api/v2/pokemon/${details.id}`;
-                    details.description = flavorResults.split('\n').join(' ')
+                  getFlavorText(details.id)
+                    .then( (flavorResults) => {
+                      let url = `https://pokeapi.co/api/v2/pokemon/${details.id}`;
+                      details.description = flavorResults.split('\n').join(' ')
 
-                    superagent.get(url)
-                      .then(apiResponse => {
-                        apiResponse.body.moves.forEach( (move) => {
-                          let moveArr = [];
-                          if(move.version_group_details[0].level_learned_at >= 1) {
-                            moveArr.push(move.version_group_details[0].level_learned_at);
-                            moveArr.push(move.move.name);
-                            details.moves.push(moveArr);
-                          }
+                      superagent.get(url)
+                        .then(apiResponse => {
+                          apiResponse.body.moves.forEach( (move) => {
+                            let moveArr = [];
+                            if(move.version_group_details[0].level_learned_at >= 1) {
+                              moveArr.push(move.version_group_details[0].level_learned_at);
+                              moveArr.push(move.move.name);
+                              details.moves.push(moveArr);
+                            }
+                          })
+                          details.moves.sort( (a, b) => a[0] - b[0])
+                          response.render(`pages/detail`, {results: details, pokemon: randomMon} )
                         })
-                        details.moves.sort( (a, b) => a[0] - b[0])
-                        response.render(`pages/detail`, {results: details, pokemon: randomMon} )
-                      })
                     })
                     .catch(err => handleError(err, response))
-                  })
-                  .catch(err => handleError(err, response))
-              })
-              .catch(err => handleError(err, response))
-          })
-          .catch(err => handleError(err, response))
-      })
+                })
+                .catch(err => handleError(err, response))
+            })
+            .catch(err => handleError(err, response))
+        })
+        .catch(err => handleError(err, response))
+    })
     .catch(err => handleError(err, response))
 }
 
@@ -330,24 +330,6 @@ function buildTypeDamageMods(i) {
 // If only given a baseType, returns an array of all damage relations of that type
 // If given a baseType AND a targetType, returns the modifier with relation to just that type
 
-function getDamageModifierFrom(baseType, targetType) {
-  // If targetType is specified, give specific result
-  if (targetType) {
-    let SQL = `SELECT type_damage_from, type_damage_from_multipler WHERE type_id=${baseType} AND type_damage_to=${targetType}`
-    return client.query(SQL)
-      .then((result) => {
-        return result.rows[0];
-      })
-  }
-
-  // if targetType is not specified, return an array of all reults
-  let SQL = `SELECT type_damage_from, type_damage_from_multipler WHERE type_id=${baseType}`
-  return client.query(SQL)
-    .then((results) => {
-      return results.rows;
-    })
-}
-
 function getDamageMods(typeOne, typeTwo) {
   let typeList = ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'];
   let typeOneIndex = typeList.indexOf(typeOne);
@@ -376,24 +358,6 @@ function getDamageMods(typeOne, typeTwo) {
 
 // If only given a baseType, returns an array of all damage relations of that type
 // If given a baseType AND a targetType, returns the modifier with relation to just that type
-
-function getDamageModifierTo(baseType, targetType) {
-  // If targetType is specified, give specific result
-  if (targetType) {
-    let SQL = `SELECT type_damage_to, type_damage_to_multipler WHERE type_id=${baseType} AND type_damage_to=${targetType}`
-    client.query(SQL)
-      .then((result) => {
-        return result.rows[0];
-      })
-  }
-
-  // if targetType is not specified, return an array of all reults
-  let SQL = `SELECT type_damage_to, type_damage_to_multipler WHERE type_id=${baseType}`
-  client.query(SQL)
-    .then((results) => {
-      return results.rows;
-    })
-}
 
 // gets target type list and puts in SQL
 function buildTargetTypes() {
