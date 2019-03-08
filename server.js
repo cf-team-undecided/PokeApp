@@ -97,44 +97,58 @@ function displayDetails(request, response) {
   return getRandomPokemon()
   .then( (randomMon) => {
 
-    return client.query(SQL, value)
-      .then( (results) => {
-        let details = new PokemonDetails(results.rows[0])
 
-        client.query(`SELECT * FROM favorites;`)
-          .then((favorites) => {
-            favorites.rows.forEach( (faves) => details.favoritesArr.push(faves.id));
+  return client.query(SQL, value)
+    .then((results) => {
+      let details = new PokemonDetails(results.rows[0])
 
-            getDamageMods(details.typeOne, details.typeTwo)
-              .then( (modResults) => {
-                modResults.forEach( (val, idx) => {
-                  if( val > 1 ) {
-                    details.weak.push(getTypeName(idx));
-                  }
-                  if( val < 1 ) {
-                    details.strong.push(getTypeName(idx));
-                  }
-                })
+      return client.query(`SELECT * FROM favorites;`)
+        .then((favorites) => {
+          favorites.rows.forEach((faves) => details.favoritesArr.push(faves.id));
 
-                getFlavorText(details.id)
-                  .then( (flavorResults) => {
-                    let url = `https://pokeapi.co/api/v2/pokemon/${details.id}`;
-                    details.description = flavorResults.split('\n').join(' ')
+          return getDamageMods(details.typeOne, details.typeTwo)
+            .then((modResults) => {
+              modResults.forEach((val, idx) => {
+                if (val > 1) {
+                  details.weak.push(getTypeName(idx));
+                }
+                if (val < 1) {
+                  details.strong.push(getTypeName(idx));
+                }
+              })
 
-                    superagent.get(url)
-                      .then(apiResponse => {
-                        apiResponse.body.moves.forEach( (move) => {
-                          let moveArr = [];
-                          if(move.version_group_details[0].level_learned_at >= 1) {
-                            moveArr.push(move.version_group_details[0].level_learned_at);
-                            moveArr.push(move.move.name);
-                            details.moves.push(moveArr);
-                          }
-                        })
-                        details.moves.sort( (a, b) => a[0] - b[0])
-                        response.render(`pages/detail`, {results: details, pokemon: randomMon} )
+              return getFlavorText(details.id)
+                .then((flavorResults) => {
+                  let url = `https://pokeapi.co/api/v2/pokemon/${details.id}`;
+                  details.description = flavorResults.split('\n').join(' ')
+
+                  return getMoveList(details.id)
+                    .then((moveList) => {
+                      console.log('129', moveList);
+                      details.moves = moveList;
+                      console.log('131', details.moves.length)
+                      details.moves.forEach((move) => {
+                        move.type_id = getTypeName(move.type_id);
                       })
+                      console.log(details);
+                      response.render(`pages/detail`, { pokemon: details })
+
                     })
+                    
+                    //refactored just above
+                  // superagent.get(url)
+                  //   .then(apiResponse => {
+                  //     apiResponse.body.moves.forEach((move) => {
+                  //       let moveArr = [];
+                  //       if (move.version_group_details[0].level_learned_at >= 1) {
+                  //         moveArr.push(move.version_group_details[0].level_learned_at);
+                  //         moveArr.push(move.move.name);
+                  //         details.moves.push(moveArr);
+                  //       }
+                  //     })
+                  //     details.moves.sort((a, b) => a[0] - b[0])
+                  //     response.render(`pages/detail`, { pokemon: details })
+                  //   })
                     .catch(err => handleError(err, response))
                   })
                   .catch(err => handleError(err, response))
@@ -219,8 +233,8 @@ function changedArrayToPrepareForEJSRender(arr) {
 function showSearch(request, response) {
   let SQL = 'SELECT * FROM species ';
 
-  if (request.body.pages === undefined){SQL += 'LIMIT 20'}
-  if (request.body.pages){ SQL += `ORDER BY national_dex_id OFFSET ${parseInt(request.body.pages)* 20} FETCH NEXT 20 ROWS ONLY`}
+  if (request.body.pages === undefined) { SQL += 'LIMIT 20' }
+  if (request.body.pages) { SQL += `ORDER BY national_dex_id OFFSET ${parseInt(request.body.pages) * 20} FETCH NEXT 20 ROWS ONLY` }
 
   return getRandomPokemon()
     .then( (randomMon) => {
@@ -237,8 +251,8 @@ function showSearch(request, response) {
 function searchBy(request, response) {
   let SQL = 'SELECT * FROM species WHERE ';
 
-  if(request.body.search) {SQL += `name='${request.body.search}'`}
-  if(request.body.search === '') {SQL += `type_primary_id='${parseInt(request.body.types)}'`}
+  if (request.body.search) { SQL += `name='${request.body.search}'` }
+  if (request.body.search === '') { SQL += `type_primary_id='${parseInt(request.body.types)}'` }
 
   return getRandomPokemon()
     .then( (randomMon) => {
@@ -453,6 +467,40 @@ function getMoveData(id) {
             return record.rows[0];
           })
           )
+        })
+    })
+}
+
+function getMoveList(id) {
+  let SQL = `SELECT * FROM moves_learned JOIN moves ON moves_learned.move_id=moves.api_id WHERE species_id=${id}`;
+  console.log('465', SQL);
+  return client.query(SQL)
+    .then((result) => {
+
+      if (result.rows.length > 0) {
+        console.log('468', result.rows)
+        return result.rows.slice(0);
+      }
+      let url = `https://pokeapi.co/api/v2/pokemon/${id}`;
+      return superagent.get(url)
+        .then((pokemonResult) => {
+          let insertSql = [];
+          pokemonResult.body.moves.forEach((move) => {
+            console.log('462', move);
+            if (move.version_group_details[0].level_learned_at >= 1) {
+              let newSQL = `INSERT INTO moves_learned(species_id, move_id, level_learned) VALUES(${id}, ${move.move.url.split('/')[6]}, ${move.version_group_details[0].level_learned_at});`
+              insertSql.push(newSQL);
+            }
+          })
+          console.log('469', insertSql);
+          return client.query(insertSql.join('\n'))
+            .then((result) => {
+              return client.query(SQL)
+                .then((result) => {
+                  return result.rows;
+                })
+            })
+
         })
     })
 }

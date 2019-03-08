@@ -45,11 +45,13 @@
         <tr>
           <th>Level Learned</th>
           <th>Name</th>
+          <th>Type</th>
         </tr>
         <% results.moves.forEach( (move) => { %>
         <tr>
-          <td><%= move[0] %></td>
-          <td><%= move[1] %></td>
+          <td><%= move.level_learned %></td>
+          <td><%= move.name %></td>
+          <td><div class="<%= move.type_id %>"><%= move.type_id %></div></td>
         </tr>
         <% }) %>
       </table>
