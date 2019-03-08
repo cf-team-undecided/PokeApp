@@ -3,17 +3,17 @@
 
 <head>
   <title>Favorite Pokémon</title>
-  <%- include('../partials/head') %>
+  <%- include('../partials/head', {random: random}) %>
 </head>
-
-<body>
-  <%- include('./../partials/header', {pokemon: pokemon}) %>
+<body class="pagey">
+    <%- include('./../partials/header') %>
+    <div id="forms">
+        <%- include('../partials/page-numbers') %>
+      </div>
   <main class="cards">
     <% results.forEach(pokemon => { %>
       <%- include('./../partials/row', {pokemon: pokemon}) %>
     <% }); %>
   </main>
-  <%- include('../partials/page-numbers') %>
 </body>
-
 </html>

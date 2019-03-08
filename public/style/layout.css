@@ -75,6 +75,7 @@
   background-color: #c4d0d9;
   grid-area: 5 / 1 / 5 / 4;
   height: 140%;
+  text-transform: none;
 }
 
 .move-box {
@@ -121,6 +122,8 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   grid-gap: 10px;
+  max-width: 80%;
+  margin: auto;
 }
 
 .row {
@@ -188,5 +191,47 @@
   border: 1px solid black;
   padding: 10px;
   background: rgba(226, 119, 115, 0.3)
+} 
+
+.about-us {
+  max-width: 80%;
+  margin: auto;
 }
 
+.about-us div {
+  border: 2px groove black;
+  padding: 5px;
+  margin: 10px;
+}
+
+.about-us img {
+  display: inline-block;
+  width: 20%;
+  height: 20%;
+}
+
+.about-us p {
+  font-size: 120%;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
+
+.about-us h3 {
+  padding: 10px;
+  font-family: Pokemon-solid;
+  color: #c2d650;
+  display: block;
+  margin-left: 40%;
+  font-size: 150%;
+  text-shadow: 5px 5px black;
+}
+
+#poke-app{
+  font-family: Pokemon-solid;
+  display: inline-block;
+  margin-left: 35%;
+  font-size: 300%;
+}
+
+#rando {
+  float: right;
+}

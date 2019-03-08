@@ -5,21 +5,21 @@
     <link rel="stylesheet" type="text/css" href="/style/modules/favorite-button.css" />
   </head>
   <body>
-  <%- include('./../partials/header', {pokemon: pokemon}) %>
-  <div class="wrapper">
+    <%- include('../partials/header', {random: random}) %>
+    <div class="wrapper">
     <div class="poke-box">
       <%- include('../partials/favorite-button', {pokemon: results}) %>
-      <h2 id="name"><%= pokemon.name %></h2>
-      <h2 id="id">National ID: <%= pokemon.id %></h2>
-      <img src="<%= pokemon.image_url %>" alt="<%= pokemon.name%>">
+      <h2 id="name"><%= results.name %></h2>
+      <h2 id="id">National ID: <%= results.id %></h2>
+      <img src="<%= results.image_url %>" alt="<%= results.name%>">
       <ul>
         <li>HT: <%= results.height %>m</li>
         <li>WT: <%= results.weight %>kg</li>
       </ul>
       <div class="type-box"> 
         <ul>
-          <li class="<%= pokemon.typeOne %>">Type One: <%= results.typeOne %> </li>
-          <li class="<%= pokemon.typeTwo %>">Type Two: <%= results.typeTwo %> </li>
+          <li class="<%= results.typeOne %>">Type One: <%= results.typeOne %> </li>
+          <li class="<%= results.typeTwo %>">Type Two: <%= results.typeTwo %> </li>
         </ul>
       </div>
     </div>

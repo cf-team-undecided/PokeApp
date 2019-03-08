@@ -31,7 +31,7 @@ app.set('view engine', 'ejs');
 app.get('/', (request, response) => {
   getRandomPokemon()
     .then( (randomMon) => {
-      response.render('./index', {pokemon: randomMon})
+      response.render('./index', {random: randomMon})
     })
 });
 
@@ -93,7 +93,7 @@ function showSearch(request, response) {
 
       return client.query(SQL)
         .then(result => {
-          response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'], pokemon: randomMon})
+          response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'], random: randomMon})
         })
     })
     .catch(err => handleError(err, response))
@@ -112,7 +112,7 @@ function searchBy(request, response) {
 
       return client.query(SQL)
         .then(result => {
-          response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'], pokemon: randomMon}
+          response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'], random: randomMon}
           )
         })
     })
@@ -120,7 +120,10 @@ function searchBy(request, response) {
 }
 
 function aboutUs (request, response) {
-  response.render('./pages/about-us');
+  return getRandomPokemon()
+    .then( (randomMon) => {
+      response.render('./pages/about-us', { random: randomMon });
+    })
 }
 
 function showFavorites(request, response) {
@@ -147,7 +150,7 @@ function showFavorites(request, response) {
                 })
               })
 
-              response.render('./pages/favorites', {results: favoritesArr, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'], pokemon: randomMon}
+              response.render('./pages/favorites', {results: favoritesArr, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'], random: randomMon}
               )
             })
         })
@@ -198,7 +201,7 @@ function displayDetails(request, response) {
                             move.type_id = getTypeName(move.type_id);
                           })
                           // Render results
-                          response.render(`pages/detail`, { results: details, pokemon: randomMon })
+                          response.render(`pages/detail`, { results: details, random: randomMon })    
                         })
                     })
                 })
