@@ -17,7 +17,7 @@ A pokedex to search for, learn about and favorite pokemon.
 
 The problem domain is for a user to be able to search for pokemon they're curious about and save their favorites. We grab the poke data using the Poke API @ https://pokeapi.co/ and cache the results in SQL.
 
-                            --Versions--
+--Versions--
 
 1.0.1 -- Added Dependencies and basic routes. 
 1.0.2 -- Hello World proof of life. 
@@ -29,15 +29,15 @@ The problem domain is for a user to be able to search for pokemon they're curiou
 1.0.8 -- Major CSS update. 
 1.0.9 -- Favorites. 
 
-         -- Dependencies -- See package.json for more details --
+-- Dependencies -- See package.json for more details --
 
 dotenv, ejs, express, pg, superagent
 
-                        --instructions to startup--
+--instructions to startup--
 
 After Git Cloning, run npm install to get our packages, run our schema and take a break for 45 minutes while it loads. Then run nodemon and you can serve it from your local host. 
 
-                           -- example API calls -- 
+-- example API calls -- 
 
             Call ===> https://pokeapi.co/api/v2/pokemon-species/34
 
@@ -74,7 +74,7 @@ gender_rate:0
 
 etc...
 
-            Call ===> https://pokeapi.co/api/v2/type/5
+Call ===> https://pokeapi.co/api/v2/type/5
 
 
 {
@@ -126,7 +126,7 @@ etc...
 }      
 
 
-                        -- Database examples --  
+-- Database examples --  
 
 
 CREATE TABLE IF NOT EXISTS types (
