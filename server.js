@@ -173,7 +173,7 @@ function buildPokemonDatabase(id) {
           // console.log(values);
           client.query(SQL, values)
             .then(() => {
-              console.log(`#${id} complete`);
+              console.log(`Pokemon #${id}, ${result.body.species.name} complete`);
             });
         })
 
@@ -184,7 +184,7 @@ function buildPokemonDatabase(id) {
 function buildTypeList() {
   let url = 'https://pokeapi.co/api/v2/type/';
 
-  superagent.get(url)
+  return superagent.get(url)
     .then((result) => {
       // console.log(result);
       result.body.results.forEach((type) => {
@@ -192,7 +192,7 @@ function buildTypeList() {
         let SQL = 'INSERT INTO types (api_id, name) VALUES($1, $2);'
         let values = ([type.url.split('/')[6], type.name]);
 
-        client.query(SQL, values)
+        return client.query(SQL, values)
           .then(() => { return });
       })
     })
@@ -207,8 +207,8 @@ function getPokemonData(id) {
     })
 }
 
-function changedArrayToPrepareForEJSRender (arr) {
-  return arr.map(type =>{
+function changedArrayToPrepareForEJSRender(arr) {
+  return arr.map(type => {
     let whole = type;
 
     // whole.type_primary_id =  getTypeName(type.type_primary_id);
@@ -218,6 +218,7 @@ function changedArrayToPrepareForEJSRender (arr) {
 
 function showSearch(request, response) {
   let SQL = 'SELECT * FROM species ';
+
   if (request.body.pages === undefined){SQL += 'LIMIT 20'}
   if (request.body.pages){ SQL += `ORDER BY national_dex_id OFFSET ${parseInt(request.body.pages)* 20} FETCH NEXT 20 ROWS ONLY`}
 
@@ -235,6 +236,7 @@ function showSearch(request, response) {
 
 function searchBy(request, response) {
   let SQL = 'SELECT * FROM species WHERE ';
+
   if(request.body.search) {SQL += `name='${request.body.search}'`}
   if(request.body.search === '') {SQL += `type_primary_id='${parseInt(request.body.types)}'`}
 
@@ -359,10 +361,10 @@ function getDamageMods(typeOne, typeTwo) {
   let typeTwoModList = [];
   return client.query(`SELECT type_damage_from_multiplier FROM types_damage_from WHERE type_id=${typeOneIndex};`)
     .then((typeOneResult) => {
-      typeOneModList = typeOneResult.rows.map((row) => {return row.type_damage_from_multiplier});
+      typeOneModList = typeOneResult.rows.map((row) => { return row.type_damage_from_multiplier });
       return client.query(`SELECT type_damage_from_multiplier FROM types_damage_from WHERE type_id=${typeTwoIndex};`)
         .then((typeTwoResult) => {
-          typeTwoModList = typeTwoResult.rows.map((row) => {return row.type_damage_from_multiplier});
+          typeTwoModList = typeTwoResult.rows.map((row) => { return row.type_damage_from_multiplier });
 
           output = output.map((element, index) => {
             return element * typeOneModList[index - 1] * typeTwoModList[index - 1]
@@ -490,37 +492,65 @@ function handleError(error, response) {
 //   app.use(express.static('./public'));
 // }
 
-// Initial database build, should be called iff database is 100% empty
+// Initial database build, each part should be called iff database is 100% empty
 function buildIfEmpty() {
+  // used to set calls back to back, instead of all at once
+  let delay = 0;
+
+  // If types arn't populated, build them - needed for foreign keys
   client.query(`SELECT * FROM types`)
     .then((result) => {
-      if (result.rows.length === 0) {
+      if (result.rows.length === 1) {
+        console.log('Types list is empty, building...')
         buildTypeList();
+        delay += 2;
       }
     })
 
+  // Species list is needed for searching
   client.query(`SELECT * FROM species`)
     .then((result) => {
-      if (result.rows.length === 0)
+      if (result.rows.length === 0) {
         for (let i = 1; i < 808; i++) {
-          setTimeout(buildPokemonDatabase, i * 2000, i);
-          console.log(`Added #${i}`);
+          setTimeout(buildPokemonDatabase, (i + delay) * 2000, i);
+
         }
+        console.log('Pokemon list is empty, building...')
+        delay += 1614;
+      }
     })
 
+  // Type damag relations are needed for strength/weakness charts
   client.query(`SELECT * FROM types_damage_to`)
     .then((result) => {
       if (result.rows.length === 0) {
         for (let i = 1; i < 19; i++) {
-          setTimeout(buildTypeDamageMods, i * 1000, i);
+          setTimeout(buildTypeDamageMods, (i + delay) * 1000, i);
         }
+        console.log('Weaknesses list is empty, building...');
+        delay += 40;
       }
+
     })
 
+  // always a single call, it can slot in wherever
+  // Displays what a move can target, foreign key for moves
   client.query(`SELECT * FROM target_type`)
     .then((result) => {
       if (result.rows.length === 0) {
         buildTargetTypes();
+        console.log('Move targetting types list is empty, building...');
+      }
+    })
+
+  // Will be needed as foreign key for movelist with details
+  client.query('SELECT * FROM moves')
+    .then((result) => {
+      if (result.rows.length === 0) {
+        for (let i = 1; i < 728; i++) {
+          setTimeout(getMoveData, (i + delay) * 1000, i);
+        }
+        console.log('Moves list is empty, building...');
       }
     })
 }
