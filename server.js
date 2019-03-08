@@ -50,6 +50,8 @@ app.get('/favorites', showFavorites);
 
 app.post('/searchBy', searchBy);
 
+app.get('/about-us', aboutUs);
+
 app.get('*', (request, response) => response.status(404).send('This route does not exist'));
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
@@ -95,54 +97,54 @@ function displayDetails(request, response) {
   let value = [request.params.id];
 
   return getRandomPokemon()
-  .then( (randomMon) => {
+    .then( (randomMon) => {
 
-    return client.query(SQL, value)
-      .then( (results) => {
-        let details = new PokemonDetails(results.rows[0])
+      return client.query(SQL, value)
+        .then( (results) => {
+          let details = new PokemonDetails(results.rows[0])
 
-        client.query(`SELECT * FROM favorites;`)
-          .then((favorites) => {
-            favorites.rows.forEach( (faves) => details.favoritesArr.push(faves.id));
+          client.query(`SELECT * FROM favorites;`)
+            .then((favorites) => {
+              favorites.rows.forEach( (faves) => details.favoritesArr.push(faves.id));
 
-            getDamageMods(details.typeOne, details.typeTwo)
-              .then( (modResults) => {
-                modResults.forEach( (val, idx) => {
-                  if( val > 1 ) {
-                    details.weak.push(getTypeName(idx));
-                  }
-                  if( val < 1 ) {
-                    details.strong.push(getTypeName(idx));
-                  }
-                })
+              getDamageMods(details.typeOne, details.typeTwo)
+                .then( (modResults) => {
+                  modResults.forEach( (val, idx) => {
+                    if( val > 1 ) {
+                      details.weak.push(getTypeName(idx));
+                    }
+                    if( val < 1 ) {
+                      details.strong.push(getTypeName(idx));
+                    }
+                  })
 
-                getFlavorText(details.id)
-                  .then( (flavorResults) => {
-                    let url = `https://pokeapi.co/api/v2/pokemon/${details.id}`;
-                    details.description = flavorResults.split('\n').join(' ')
+                  getFlavorText(details.id)
+                    .then( (flavorResults) => {
+                      let url = `https://pokeapi.co/api/v2/pokemon/${details.id}`;
+                      details.description = flavorResults.split('\n').join(' ')
 
-                    superagent.get(url)
-                      .then(apiResponse => {
-                        apiResponse.body.moves.forEach( (move) => {
-                          let moveArr = [];
-                          if(move.version_group_details[0].level_learned_at >= 1) {
-                            moveArr.push(move.version_group_details[0].level_learned_at);
-                            moveArr.push(move.move.name);
-                            details.moves.push(moveArr);
-                          }
+                      superagent.get(url)
+                        .then(apiResponse => {
+                          apiResponse.body.moves.forEach( (move) => {
+                            let moveArr = [];
+                            if(move.version_group_details[0].level_learned_at >= 1) {
+                              moveArr.push(move.version_group_details[0].level_learned_at);
+                              moveArr.push(move.move.name);
+                              details.moves.push(moveArr);
+                            }
+                          })
+                          details.moves.sort( (a, b) => a[0] - b[0])
+                          response.render(`pages/detail`, {results: details, pokemon: randomMon} )
                         })
-                        details.moves.sort( (a, b) => a[0] - b[0])
-                        response.render(`pages/detail`, {results: details, pokemon: randomMon} )
-                      })
                     })
                     .catch(err => handleError(err, response))
-                  })
-                  .catch(err => handleError(err, response))
-              })
-              .catch(err => handleError(err, response))
-          })
-          .catch(err => handleError(err, response))
-      })
+                })
+                .catch(err => handleError(err, response))
+            })
+            .catch(err => handleError(err, response))
+        })
+        .catch(err => handleError(err, response))
+    })
     .catch(err => handleError(err, response))
 }
 
@@ -226,7 +228,7 @@ function showSearch(request, response) {
 
       return client.query(SQL)
         .then(result => {
-          console.log('normal', result.rows[0])
+          // console.log('normal', result.rows[0])
           response.render('./pages/search', {result: result.rows, types: ['none', 'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'], pokemon: randomMon})
         })
     })
@@ -249,6 +251,10 @@ function searchBy(request, response) {
         })
     })
     .catch(err => handleError(err, response))
+}
+
+function aboutUs (request, response) {
+  response.render('./pages/about-us');
 }
 
 function showFavorites(request, response) {

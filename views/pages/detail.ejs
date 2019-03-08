@@ -8,7 +8,7 @@
   <%- include('./../partials/header', {pokemon: pokemon}) %>
   <div class="wrapper">
     <div class="poke-box">
-      <%- include('../partials/favorite-button') %>
+      <%- include('../partials/favorite-button', {pokemon: results}) %>
       <h2 id="name"><%= pokemon.name %></h2>
       <h2 id="id">National ID: <%= pokemon.id %></h2>
       <img src="<%= pokemon.image_url %>" alt="<%= pokemon.name%>">
@@ -16,7 +16,7 @@
         <li>HT: <%= results.height %>m</li>
         <li>WT: <%= results.weight %>kg</li>
       </ul>
-      <div class="type-box">
+      <div class="type-box"> 
         <ul>
           <li class="<%= pokemon.typeOne %>">Type One: <%= pokemon.typeOne %> </li>
           <li class="<%= pokemon.typeTwo %>">Type Two: <%= pokemon.typeTwo %> </li>
