@@ -7,14 +7,15 @@
 </head>
 
 <body>
-  <%- include('./../partials/header', {pokemon: pokemon}) %>
+  <%- include('./../partials/header') %>
+  <div id="forms">
+  <%- include('../partials/search-form') %>
+  <%- include('../partials/page-numbers') %>
+  </div>
   <main class="cards">
-    <%- include('../partials/search-form') %>
-    <% result.forEach(result => { %>
-      <%- include('../partials/row', {pokemon: result}) %>
+    <% result.forEach(pokemon => { %>
+      <%- include('../partials/row', {pokemon: pokemon}) %>
     <% }); %>
   </main>
-  <%- include('../partials/page-numbers') %>
 </body>
-
 </html>

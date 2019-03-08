@@ -9,17 +9,17 @@
   <div class="wrapper">
     <div class="poke-box">
       <%- include('../partials/favorite-button', {pokemon: results}) %>
-      <img src="<%= results.image_url %>" alt="<%= results.name%>">
-      <h2><%= results.id %></h2>
-      <h2><%= results.name %></h2>
+      <h2 id="name"><%= pokemon.name %></h2>
+      <h2 id="id">National ID: <%= pokemon.id %></h2>
+      <img src="<%= pokemon.image_url %>" alt="<%= pokemon.name%>">
       <ul>
         <li>HT: <%= results.height %>m</li>
         <li>WT: <%= results.weight %>kg</li>
       </ul>
-      <div class="type-box">
+      <div class="type-box"> 
         <ul>
-          <li class="<%= results.typeOne %>"> <%= results.typeOne %> </li>
-          <li class="<%= results.typeTwo %>"> <%= results.typeTwo %> </li>
+          <li class="<%= pokemon.typeOne %>">Type One: <%= pokemon.typeOne %> </li>
+          <li class="<%= pokemon.typeTwo %>">Type Two: <%= pokemon.typeTwo %> </li>
         </ul>
       </div>
     </div>
@@ -41,7 +41,7 @@
     </div>
     <div class="description-box"><%= results.description %></div>
     <div class="move-box">
-      <table>
+      <table class="move-table">
         <tr>
           <th>Level Learned</th>
           <th>Name</th>
@@ -57,7 +57,6 @@
       </table>
     </div>
   </div>
-
   <%- include('../partials/jquery')%>
 </body>
 </html>

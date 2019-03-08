@@ -49,6 +49,8 @@ app.post('/add/', addFavorite);
 
 app.delete('/delete', deleteFavorite);
 
+app.get('/about-us', aboutUs);
+
 app.get('*', (request, response) => response.status(404).send('This route does not exist'));
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
@@ -117,7 +119,10 @@ function searchBy(request, response) {
     .catch(err => handleError(err, response))
 }
 
-// Displays all favorited Pokemon
+function aboutUs (request, response) {
+  response.render('./pages/about-us');
+}
+
 function showFavorites(request, response) {
   let SQL = 'SELECT * FROM species ';
   let fullArr = [];
@@ -512,4 +517,4 @@ function getMoveList(id) {
     })
 }
 
-buildIfEmpty();
+// buildIfEmpty();
