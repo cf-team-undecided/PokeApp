@@ -82,8 +82,8 @@ function PokemonDetails(pokemon) {
 function showSearch(request, response) {
   let SQL = 'SELECT * FROM species ';
 
-  if (request.body.pages === undefined){SQL += 'LIMIT 20'}
-  if (request.body.pages){ SQL += `ORDER BY national_dex_id OFFSET ${parseInt(request.body.pages)* 20} FETCH NEXT 20 ROWS ONLY`}
+  if (request.body.pages === undefined) { SQL += 'LIMIT 20' }
+  if (request.body.pages) { SQL += `ORDER BY national_dex_id OFFSET ${parseInt(request.body.pages) * 20} FETCH NEXT 20 ROWS ONLY` }
 
   // Get the random Pokemon object
   return getRandomPokemon()
@@ -101,8 +101,8 @@ function showSearch(request, response) {
 function searchBy(request, response) {
   let SQL = 'SELECT * FROM species WHERE ';
 
-  if(request.body.search) {SQL += `name='${request.body.search}'`}
-  if(request.body.search === '') {SQL += `type_primary_id='${parseInt(request.body.types)}'`}
+  if (request.body.search) { SQL += `name='${request.body.search}'` }
+  if (request.body.search === '') { SQL += `type_primary_id='${parseInt(request.body.types)}'` }
 
   // Get the random Pokemon object
   return getRandomPokemon()
@@ -183,25 +183,19 @@ function displayDetails(request, response) {
                   // Query the API for the Pokemon's flavor text and move list
                   getFlavorText(details.id)
                     .then( (flavorResults) => {
-                      let url = `https://pokeapi.co/api/v2/pokemon/${details.id}`;
                       details.description = flavorResults.split('\n').join(' ')
 
-                      superagent.get(url)
-                        .then(apiResponse => {
-                          apiResponse.body.moves.forEach( (move) => {
-                            let moveArr = [];
-                            if(move.version_group_details[0].level_learned_at >= 1) {
-                              moveArr.push(move.version_group_details[0].level_learned_at);
-                              moveArr.push(move.move.name);
-                              details.moves.push(moveArr);
-                            }
+                      // Query the database to get move details if available, or get them from the API
+                      return getMoveList(details.id)
+                        .then((moveList) => {
+                          details.moves = moveList;
+                          details.moves.forEach((move) => {
+                            move.type_id = getTypeName(move.type_id);
                           })
-
-                          // Sort move list by level learned and render results
-                          details.moves.sort( (a, b) => a[0] - b[0])
-                          response.render(`pages/detail`, {results: details, pokemon: randomMon} )
+                          // Render results
+                          response.render(`pages/detail`, { results: details, pokemon: randomMon })    
                         })
-                    })
+                      })
                 })
             })
         })
@@ -483,6 +477,37 @@ function getFlavorText(id) {
           let values = [id, result.body.flavor_text_entries.filter(entry => entry.language.name === 'en')[0].flavor_text];
           client.query(newSQL, values);
           return result.body.flavor_text_entries.filter(entry => entry.language.name === 'en')[0].flavor_text
+        })
+    })
+}
+
+function getMoveList(id) {
+  let SQL = `SELECT * FROM moves_learned JOIN moves ON moves_learned.move_id=moves.api_id WHERE species_id=${id}`;
+  return client.query(SQL)
+    .then((result) => {
+
+      if (result.rows.length > 0) {
+        return result.rows.slice(0);
+      }
+      let url = `https://pokeapi.co/api/v2/pokemon/${id}`;
+      return superagent.get(url)
+        .then((pokemonResult) => {
+          let insertSql = [];
+          pokemonResult.body.moves.forEach((move) => {
+            if (move.version_group_details[0].level_learned_at >= 1) {
+              let newSQL = `INSERT INTO moves_learned(species_id, move_id, level_learned) VALUES(${id}, ${move.move.url.split('/')[6]}, ${move.version_group_details[0].level_learned_at});`
+              insertSql.push(newSQL);
+            }
+          })
+          return client.query(insertSql.join('\n'))
+            .then(() => {
+
+              return client.query(SQL)
+                .then((result) => {
+                  return result.rows;
+                })
+            })
+
         })
     })
 }
