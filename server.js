@@ -198,9 +198,9 @@ function displayDetails(request, response) {
                             move.type_id = getTypeName(move.type_id);
                           })
                           // Render results
-                          response.render(`pages/detail`, { results: details, pokemon: randomMon })    
+                          response.render(`pages/detail`, { results: details, pokemon: randomMon })
                         })
-                      })
+                    })
                 })
             })
         })
