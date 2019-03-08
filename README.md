@@ -1,6 +1,8 @@
 # PokeApp
 This is our 301d44 Final Project! Yee Haw
 
+Project : Gotta Cache 'em All! 
+
 Started: 20170304
 
 Authors: Dana Voros, Andrew "Roketsu" Roska, Peter Murphy, and Alexander White
@@ -8,11 +10,8 @@ Authors: Dana Voros, Andrew "Roketsu" Roska, Peter Murphy, and Alexander White
 # PokeApp
                 This is our 301d44 Final Project! Yee Haw
 
-Project : Gotta Cache 'em All! 
 
 Started: 20170304
-
-Authors: Dana Voros, Andrew "Roketsu" Roska, Peter Murphy, and Alexander White
 
 A pokedex to search for, learn about and favorite pokemon. 
 
@@ -30,15 +29,15 @@ The problem domain is for a user to be able to search for pokemon they're curiou
 1.0.8 -- Major CSS update. 
 1.0.9 -- Favorites. 
 
-         -- Dependencies -- See package.json for more details. 
+         -- Dependencies -- See package.json for more details --
 
 dotenv, ejs, express, pg, superagent
 
-                        --instructions to starup--
+                        --instructions to startup--
 
-After Git Cloning, run npm install to get our packages, run our schema and take a break for 45 minutes while it loads. 
+After Git Cloning, run npm install to get our packages, run our schema and take a break for 45 minutes while it loads. Then run nodemon and you can serve it from your local host. 
 
-example API calls 
+                           -- example API calls -- 
 
             Call ===> https://pokeapi.co/api/v2/pokemon-species/34
 
